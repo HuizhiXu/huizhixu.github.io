@@ -6,8 +6,15 @@
     <description>Recent content in Blog on 徐慧志的个人博客</description>
     <generator>Hugo</generator>
     <language>chs</language>
-    <lastBuildDate>Thu, 17 Apr 2025 22:11:50 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 12 Jun 2025 21:01:50 +0800</lastBuildDate>
     <atom:link href="https://huizhixu.github.io/chs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Weaviate使用（一） 使用ollama启用大模型和向量模型</title>
+      <link>https://huizhixu.github.io/chs/know_how/20250612weaviate_usage_ollama/</link>
+      <pubDate>Thu, 12 Jun 2025 21:01:50 +0800</pubDate>
+      <guid>https://huizhixu.github.io/chs/know_how/20250612weaviate_usage_ollama/</guid>
+      <description>&lt;h2 id=&#34;先决条件&#34;&gt;先决条件&lt;/h2&gt;&#xA;&lt;p&gt;在本地用docker-compsoe.yml部署Weaviate。因为使用ollama来启动模型，所以在配置文件中要加上&lt;code&gt;ENABLE_MODULES: &#39;text2vec-ollama,generative-ollama&#39;&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
     <item>
       <title>2025-04-17 我辞职了，但我对旷野没有兴趣</title>
       <link>https://huizhixu.github.io/chs/life/20250417%E6%88%91%E8%BE%9E%E8%81%8C%E4%BA%86%E4%BD%86%E6%88%91%E6%B2%A1%E6%9C%89%E5%AF%BB%E6%89%BE%E6%97%B7%E9%87%8E/</link>
