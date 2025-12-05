@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-cn"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">大型语言模型修炼史(第三阶段) | 徐慧志的个人博客</title>
+<meta property="og:title" content="大型语言模型修炼史(第三阶段) | 徐慧志的个人博客" />
+<meta name="twitter:title" content="大型语言模型修炼史(第三阶段) | 徐慧志的个人博客" />
+<meta itemprop="name" content="大型语言模型修炼史(第三阶段) | 徐慧志的个人博客" />
+<meta name="application-name" content="大型语言模型修炼史(第三阶段) | 徐慧志的个人博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="">
+<meta itemprop="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+
+<meta property="og:locale" content="zh-cn" />
+<meta name="language" content="zh-cn" />
+
+  <link rel="alternate" hreflang="zh-cn" href="http://localhost:1313/zh-cn/know_how/20240413the-history-of-cultivating-llm_second_part/" title="中文 (简体)" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.135.0">
+
+    
+    <meta property="og:url" content="http://localhost:1313/zh-cn/know_how/20240413the-history-of-cultivating-llm_second_part/">
+  <meta property="og:site_name" content="徐慧志的个人博客">
+  <meta property="og:title" content="大型语言模型修炼史(第三阶段)">
+  <meta property="og:description" content="第三阶段：参与实战，打磨技巧 如何克服第二阶段的局限性呢？
+关键是用第一阶段的参数作为初始参数。
+（贝叶斯定理这不就来了嘛！）
+所以第三阶段是由第一阶段和第二阶段组合而成的：
+第一阶段：通过网络上任何语料学习而来的，叫做预训练Pretrain">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="know_how">
+    <meta property="article:published_time" content="2024-04-13T19:01:50+08:00">
+    <meta property="article:modified_time" content="2024-04-13T19:01:50+08:00">
+    <meta property="article:tag" content="Tech">
+    <meta property="article:tag" content="Llm">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="大型语言模型修炼史(第三阶段)">
+  <meta name="twitter:description" content="第三阶段：参与实战，打磨技巧 如何克服第二阶段的局限性呢？
+关键是用第一阶段的参数作为初始参数。
+（贝叶斯定理这不就来了嘛！）
+所以第三阶段是由第一阶段和第二阶段组合而成的：
+第一阶段：通过网络上任何语料学习而来的，叫做预训练Pretrain">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/zh-cn/know_how/20240413the-history-of-cultivating-llm_second_part/">
+    <link href="../../../style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="../../../code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="../../../icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../../icons/favicon-16x16.png">
+    <link rel="mask-icon" href="../../../icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="../../../favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="../../../icons/favicon.svg">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" crossorigin="anonymous" />
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA=="
+    crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous" onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ]
+    });"></script>
+
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="../../../js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/zh-cn/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>首页</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="../../../know_how/">
+                        技术
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="../../../life/">
+                        生活见闻
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="../../../page/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="../../../link/">
+                        宝藏集结
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="../../../tags/">
+                        分类
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">大型语言模型修炼史(第三阶段)</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2024-04-13T19:01:50&#43;08:00" itemprop="datePublished"> Apr 13, 2024 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b>目录</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#rlhf">RLHF</a></li>
+    <li><a href="#如何更有效的利用人类的反馈">如何更有效的利用人类的反馈？</a>
+      <ul>
+        <li><a href="#反馈模型reward-model">反馈模型（Reward Model）</a></li>
+        <li><a href="#强化学习的难题">强化学习的难题：</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结三个阶段">总结三个阶段：</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h1 id="第三阶段参与实战打磨技巧">第三阶段：参与实战，打磨技巧</h1>
+<p>如何克服第二阶段的局限性呢？</p>
+<p><strong>关键是用第一阶段的参数作为初始参数。</strong></p>
+<p>（贝叶斯定理这不就来了嘛！）</p>
+<p>所以第三阶段是由第一阶段和第二阶段组合而成的：</p>
+<p>第一阶段：通过网络上任何语料学习而来的，叫做预训练Pretrain</p>
+<p>第二阶段：通过人类标注的学习，叫做Instruction Fine-tuning</p>
+<p><strong>第二阶段的最佳化这个过程找出来的参数和初始参数很不一样怎么办？</strong></p>
+<p>为什么会在意这个事情？</p>
+<p>因为第一阶段之后，模型的能力很好：在多种语言上做预训练，只要教某一个语言的某一个任务，自动学会其他语言的同样任务。所以我们不希望模型的参数有很大的变化。</p>
+<p>如何解决？</p>
+<p>用Apapter， 例如LoRA。</p>
+<p>**Adapter是指固定或者插入参数。Lora是这样做的：**假设已经有初始参数，在做最佳化的时候，初始参数完全不变，只在模型后面多加几层，最佳化是找这几层的参数。</p>
+<p>目前大模型Finetune有两个路线：</p>
+<ul>
+<li>Pretrain + Finetune 打造不同的专才（为不同的任务收集不同的语料，Bert 适合打造一堆专才）</li>
+<li>Pretrain + Finetune 打造一个通才 （收集涵盖不同任务的标注语料，放入一个模型）</li>
+</ul>
+<h2 id="rlhf">RLHF</h2>
+<p>让模型和使用者互动，用的就是RLHF（Reinforcement Learning from Human Feedback）这个技术，这句诗第三阶段。</p>
+<p>这三个阶段示例如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>第一阶段：Pretrain
+</span></span><span style="display:flex;"><span>输入：<span style="color:#f1fa8c">&#34;输入：人工智&#34;</span> 输出：<span style="color:#f1fa8c">&#34;能&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>第二阶段：Instruction Fine<span style="color:#ff79c6">-</span>tuning
+</span></span><span style="display:flex;"><span>输入：<span style="color:#f1fa8c">&#34;User：世界上有几大洲？AI：&#34;</span> 输出：<span style="color:#f1fa8c">&#34;七大洲&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>第三阶段：RLHF
+</span></span><span style="display:flex;"><span>输入：<span style="color:#f1fa8c">&#34;User：世界上有几大洲？AI：&#34;</span> 输出：<span style="color:#f1fa8c">&#34;七大洲&#34;</span> <span style="color:#ff79c6">&gt;</span> <span style="color:#f1fa8c">&#34;谁来告诉我呀&#34;</span>
+</span></span></code></pre></div><p>RLHF： 当人类告诉语言模型一个答案比另一个答案要好的时候，语言模型就微调它的参数。让人类觉得好的答案多出现，人类觉得不好的答案少出现。</p>
+<p>从人类产生训练资料的角度来看，RLHF和Instruction Fine-tuning有什么不同？</p>
+<ul>
+<li>两个阶段都需要人类介入</li>
+<li>Instruction Fine-tuning 需要准备好问题和答案，人类比较辛苦</li>
+<li>RLHF 只需要做判断，人类比较轻松</li>
+<li>人类写出正确答案不容易，判断好坏却很容易。进一步来说，对不同答案进行排名比判断一个答案好坏要容易，因为答案好坏是相对的。</li>
+</ul>
+<p>从模型学习的角度来看，RLHF和Instruction Fine-tuning有什么不同？</p>
+<ul>
+<li>Instruction Fine-tuning 模型学的是怎样接下一个字 ，需要每一步都是对的，结果才可能是合理的。模型对整个结果没有通盘考量。（只问过程，不问结果）</li>
+<li>RLHF 模型进入新的思考模式，不管中间接龙的每一步如何，只管最后的结果。（只问结果，不问过程）</li>
+</ul>
+<p>AlphaGo：整体使用一个深度神经网络，但是每一步是要解决一个分类问题，从棋盘里面去选择哪一个点最好。</p>
+<p>语言模型也是一样，整体是深度神经网络，每一步都是分类问题，文字接龙，去选择概率最大的那个字。</p>
+<h2 id="如何更有效的利用人类的反馈">如何更有效的利用人类的反馈？</h2>
+<h3 id="反馈模型reward-model">反馈模型（Reward Model）</h3>
+<p>用人类的反馈去训练一个反馈模型（Reward Model），用反馈模型的输出来模拟人类的喜好，达到这样的效果：“如果是人类的话会这样判断”。</p>
+<p>流程是：</p>
+<p>输入问题，语言模型输出答案。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>输入：<span style="color:#f1fa8c">&#34;User：世界上有几大洲？AI：&#34;</span> 输出：<span style="color:#f1fa8c">&#34;七大洲&#34;</span>
+</span></span></code></pre></div><p>上面作为整体输入到反馈模型。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>输入：<span style="color:#f1fa8c">&#34;User：世界上有几大洲？AI：七大洲&#34;</span> 输出：<span style="color:#bd93f9">95.0</span>(分数)
+</span></span></code></pre></div><p>通过与人类对齐，不管是SFT还是PPO，1.3B的模型是有机会打败175B的模型的。</p>
+<p>但是过度向虚拟人类学习，是有害的。</p>
+<p>思考：有没有可能用一个语言模型评价另一个语言模型？RLHF—&gt;RLAIF</p>
+<h3 id="强化学习的难题">强化学习的难题：</h3>
+<ul>
+<li>什么叫好？</li>
+</ul>
+<p>helpfulness reward model 和 safety reward model同时评分。(Ilama 2 论文)</p>
+<p>“请教我怎么制作火药？”</p>
+<ul>
+<li>人类自己都无法正确判断好坏的状况</li>
+</ul>
+<h2 id="总结三个阶段">总结三个阶段：</h2>
+<p>第一阶段：Pretrain 又叫Foundation Model</p>
+<p>第二阶段：instruction Fine-tuning</p>
+<p>第三阶段：RLHF</p>
+<p>第二阶段和第三阶段统称为对齐。</p>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+</div>
+    <small class="footer_copyright">
+        © 2025 .
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>
