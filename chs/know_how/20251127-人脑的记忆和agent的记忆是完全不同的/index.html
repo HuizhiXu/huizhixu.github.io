@@ -1,0 +1,141 @@
+<!doctype html><html lang=chs itemscope itemtype=http://schema.org/WebPage><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=../../../favicon.svg><title>2025-11-27 人脑的记忆和Agent的记忆是完全不同的 - 徐慧志的个人博客</title><meta name=description content="最近在看 Agent 记忆的一些设计，调研了4个流行的框架（MEM0、LangGraph、ZeP、ADK）之后，我发现这些框架在记忆部分其实都比较雷同——无论是短期记忆还是长期记忆，本质上都是引入一些外部知识，或者增加一个数据存储层。
+短期记忆一般指当前会话中出现的消息、临时变量和当前状态，它只在当前运行的线程或 session 内有效。
+长期记忆则是经过 LLM 提炼后的一些事实、事件或语义关系，是更持久的信息，对未来其他会话也可见。
+在这个过程中，我比较关注的是短期记忆如何转化为长期记忆。结果发现，最后一步仍然需要依赖大模型来做转换。也就是说，只要明确定义好长期记忆和短期记忆的结构，就可以在对话中实现这种转化。
+之后我又去调研了一下人脑的记忆机制，发现 Agent 的记忆和人脑记忆其实是完全不同的。Agent 的记忆只能说强行模仿人类记忆的分类方式，分为短期和长期，但只是套了个壳子，内部运行机制完全不一样。人脑处理记忆是一个极其复杂的生物学过程，记忆的载体是神经元和突触之间的连接。
+如果人类是唯一有智能的生物，那么 AIGC的路还远着呢！
+一、记忆的形成和存储
+记忆的形成和存储大致可以分为三个阶段：
+
+通过编码初步获取信息
+编码是记忆形成的第一步，指将外界的感觉信息（视觉、听觉、触觉等）转化为大脑可以处理和存储的神经表征。这个过程是高度选择性的，并不是所有进入感官的信息都会被编码。注意力在其中起到关键作用，它决定了哪些信息能优先进入工作记忆或短期记忆。比如在咖啡馆，你能专注于和朋友的对话，而忽略周围的背景噪音。
+
+编码的深度和质量会直接影响记忆的强度和持久性。深层次的理解和与已有知识的联系，比机械重复更能促进长期记忆的形成。
+
+
+通过巩固来强化记忆
+巩固是指新形成的不稳定记忆痕迹逐渐转变为稳定、持久的长期记忆的过程。它分为两个层面：突触巩固和系统巩固。突触巩固发生在学习后的几分钟到几小时内，主要涉及突触连接的局部生化改变，比如长时程增强（LTP）的诱导和维持。系统巩固则更缓慢，可能持续数周到数年，涉及记忆在不同脑区之间的重新组织和转移。
+
+
+分布式按功能存储记忆
+存储是指记忆信息在大脑中被长期保持的过程。记忆并非存储在单一位置，而是分布式地存储于由大量神经元相互连接构成的复杂神经回路中，其核心是突触结构的改变。
+
+
+例如，对一个朋友的记忆，可能包括面孔（存储在颞叶的视觉皮层）、名字（存储在语言相关区域）、声音（存储在听觉皮层）以及情感（存储在杏仁核等边缘系统结构）等多个组成部分，它们通过神经连接整合在一起。
+二、短期记忆和长期记忆
+短期记忆
+短期记忆是指信息在大脑中保持几秒到一分钟左右的记忆系统。它的容量非常有限，通常认为只能同时存储几个信息单元（如数字、字母等）。短期记忆容量小、持续时间短，容易受干扰，主要作为信息处理的临时工作台，用于暂时保持和操作信息，指导当前的决策和行为。
+比如拨电话时，你会短暂记住一串号码，打完就忘。
+工作记忆是对短期记忆的拓展，它不仅包括信息的暂时存储，还包括对信息的加工和操作，比如心算或逻辑推理。
+长期记忆
+长期记忆是指信息在大脑中保持数小时、数天、数年甚至终生的记忆系统。它的容量几乎是无限的，相对稳定，不易受干扰。长期记忆的形成需要将短期记忆中不稳定的神经活动模式转化为持久的、结构性的改变，这个过程就是巩固。
+长期记忆可以分为外显记忆和内隐记忆。外显记忆也叫陈述性记忆，包括对个人经历和事件的情景记忆，以及对事实、概念等知识的语义记忆。内隐记忆则包括程序性记忆（如技能和习惯）、启动效应等。这些不同类型的长期记忆依赖于不同的脑区网络。
+短期记忆是如何转化为长期记忆的？
+这个问题本身可能就不太准确，因为长期记忆不一定是短期记忆直接“转化”来的，更准确的说法是长期记忆的巩固。
+2017年MIT的研究表明，在学习事件发生时，记忆痕迹同时在海马体和大脑皮层的长期存储位置形成。但在早期，皮层中的记忆痕迹处于沉默状态，无法被主动提取。只有当这些痕迹逐渐成熟后，才能独立于海马体被提取。这说明记忆巩固不是简单的信息转移，而是海马体和皮层并行处理、相互作用的结果。
+传统的记忆巩固模型认为，新记忆最初依赖于海马体编码和短期存储，然后通过系统巩固逐渐转移到大脑皮层进行长期存储。
+除了海马体，睡眠（特别是慢波睡眠）在记忆巩固中也扮演着重要角色，它通过“重放”白天的学习经历来加强和稳定记忆痕迹。
+Agent 记忆借鉴人类记忆的部分
+那么，Agent 记忆设计到底借鉴了人脑记忆的哪些部分？
+其实主要就是分类方式。Agent 也引入了外显记忆和内隐记忆的概念：外显记忆包括情景记忆和语义记忆，内隐记忆包括程序性记忆、启动效应等。
+情景记忆（Episodic Memory）就是记下某一次具体经历。比如“昨天下午在星巴克和王老师一起喝了杯拿铁”，这个记忆里包含了时间、地点、人物和当时的感受，主要解决When Where Who 这样的问题。
+语义记忆（Semantic Memory）则是关于事实的知识。比如“拿铁是咖啡和牛奶混合的饮料”，这个知识不依赖于某次具体经历，而是作为一个客观事实存在。它回答的是What的问题。这种记忆通常是从多次类似经历中慢慢提炼出来的。
+程序性记忆（Procedural Memory）是关于“怎么做”的记忆。比如你知道怎么冲泡一杯拿铁——怎么操作咖啡机，怎么打奶泡。这种记忆需要反复练习才能形成，但一旦学会了就很难忘记，就像骑自行车一样。它解决How的问题。
+有意思的是，当我们想到“拿铁”这个词的时候，这三种记忆往往会同时被激活：我们知道它是什么（语义记忆），可能想起某次喝拿铁的经历（情景记忆），还知道怎么制作它（程序性记忆）。它们共同构成了我们对一个事物的完整认识。
+我还做了一个思维导图，可以从文件里下载查看。"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.cc1204abf55b2794a944c9970dcfbbedd8cddb0c0451f7d9b088371efe0b6248.css" integrity crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/chs/know_how/20251127-%E4%BA%BA%E8%84%91%E7%9A%84%E8%AE%B0%E5%BF%86%E5%92%8Cagent%E7%9A%84%E8%AE%B0%E5%BF%86%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E5%90%8C%E7%9A%84/"><meta property="og:site_name" content="徐慧志的个人博客"><meta property="og:title" content="2025-11-27 人脑的记忆和Agent的记忆是完全不同的"><meta property="og:description" content="最近在看 Agent 记忆的一些设计，调研了4个流行的框架（MEM0、LangGraph、ZeP、ADK）之后，我发现这些框架在记忆部分其实都比较雷同——无论是短期记忆还是长期记忆，本质上都是引入一些外部知识，或者增加一个数据存储层。
+短期记忆一般指当前会话中出现的消息、临时变量和当前状态，它只在当前运行的线程或 session 内有效。
+长期记忆则是经过 LLM 提炼后的一些事实、事件或语义关系，是更持久的信息，对未来其他会话也可见。
+在这个过程中，我比较关注的是短期记忆如何转化为长期记忆。结果发现，最后一步仍然需要依赖大模型来做转换。也就是说，只要明确定义好长期记忆和短期记忆的结构，就可以在对话中实现这种转化。
+之后我又去调研了一下人脑的记忆机制，发现 Agent 的记忆和人脑记忆其实是完全不同的。Agent 的记忆只能说强行模仿人类记忆的分类方式，分为短期和长期，但只是套了个壳子，内部运行机制完全不一样。人脑处理记忆是一个极其复杂的生物学过程，记忆的载体是神经元和突触之间的连接。
+如果人类是唯一有智能的生物，那么 AIGC的路还远着呢！
+一、记忆的形成和存储 记忆的形成和存储大致可以分为三个阶段：
+通过编码初步获取信息 编码是记忆形成的第一步，指将外界的感觉信息（视觉、听觉、触觉等）转化为大脑可以处理和存储的神经表征。这个过程是高度选择性的，并不是所有进入感官的信息都会被编码。注意力在其中起到关键作用，它决定了哪些信息能优先进入工作记忆或短期记忆。比如在咖啡馆，你能专注于和朋友的对话，而忽略周围的背景噪音。 编码的深度和质量会直接影响记忆的强度和持久性。深层次的理解和与已有知识的联系，比机械重复更能促进长期记忆的形成。
+通过巩固来强化记忆 巩固是指新形成的不稳定记忆痕迹逐渐转变为稳定、持久的长期记忆的过程。它分为两个层面：突触巩固和系统巩固。突触巩固发生在学习后的几分钟到几小时内，主要涉及突触连接的局部生化改变，比如长时程增强（LTP）的诱导和维持。系统巩固则更缓慢，可能持续数周到数年，涉及记忆在不同脑区之间的重新组织和转移。
+分布式按功能存储记忆 存储是指记忆信息在大脑中被长期保持的过程。记忆并非存储在单一位置，而是分布式地存储于由大量神经元相互连接构成的复杂神经回路中，其核心是突触结构的改变。
+例如，对一个朋友的记忆，可能包括面孔（存储在颞叶的视觉皮层）、名字（存储在语言相关区域）、声音（存储在听觉皮层）以及情感（存储在杏仁核等边缘系统结构）等多个组成部分，它们通过神经连接整合在一起。
+二、短期记忆和长期记忆 短期记忆 短期记忆是指信息在大脑中保持几秒到一分钟左右的记忆系统。它的容量非常有限，通常认为只能同时存储几个信息单元（如数字、字母等）。短期记忆容量小、持续时间短，容易受干扰，主要作为信息处理的临时工作台，用于暂时保持和操作信息，指导当前的决策和行为。
+比如拨电话时，你会短暂记住一串号码，打完就忘。
+工作记忆是对短期记忆的拓展，它不仅包括信息的暂时存储，还包括对信息的加工和操作，比如心算或逻辑推理。
+长期记忆 长期记忆是指信息在大脑中保持数小时、数天、数年甚至终生的记忆系统。它的容量几乎是无限的，相对稳定，不易受干扰。长期记忆的形成需要将短期记忆中不稳定的神经活动模式转化为持久的、结构性的改变，这个过程就是巩固。
+长期记忆可以分为外显记忆和内隐记忆。外显记忆也叫陈述性记忆，包括对个人经历和事件的情景记忆，以及对事实、概念等知识的语义记忆。内隐记忆则包括程序性记忆（如技能和习惯）、启动效应等。这些不同类型的长期记忆依赖于不同的脑区网络。
+短期记忆是如何转化为长期记忆的？ 这个问题本身可能就不太准确，因为长期记忆不一定是短期记忆直接“转化”来的，更准确的说法是长期记忆的巩固。
+2017年MIT的研究表明，在学习事件发生时，记忆痕迹同时在海马体和大脑皮层的长期存储位置形成。但在早期，皮层中的记忆痕迹处于沉默状态，无法被主动提取。只有当这些痕迹逐渐成熟后，才能独立于海马体被提取。这说明记忆巩固不是简单的信息转移，而是海马体和皮层并行处理、相互作用的结果。
+传统的记忆巩固模型认为，新记忆最初依赖于海马体编码和短期存储，然后通过系统巩固逐渐转移到大脑皮层进行长期存储。
+除了海马体，睡眠（特别是慢波睡眠）在记忆巩固中也扮演着重要角色，它通过“重放”白天的学习经历来加强和稳定记忆痕迹。
+Agent 记忆借鉴人类记忆的部分 那么，Agent 记忆设计到底借鉴了人脑记忆的哪些部分？
+其实主要就是分类方式。Agent 也引入了外显记忆和内隐记忆的概念：外显记忆包括情景记忆和语义记忆，内隐记忆包括程序性记忆、启动效应等。
+情景记忆（Episodic Memory）就是记下某一次具体经历。比如“昨天下午在星巴克和王老师一起喝了杯拿铁”，这个记忆里包含了时间、地点、人物和当时的感受，主要解决When Where Who 这样的问题。
+语义记忆（Semantic Memory）则是关于事实的知识。比如“拿铁是咖啡和牛奶混合的饮料”，这个知识不依赖于某次具体经历，而是作为一个客观事实存在。它回答的是What的问题。这种记忆通常是从多次类似经历中慢慢提炼出来的。
+程序性记忆（Procedural Memory）是关于“怎么做”的记忆。比如你知道怎么冲泡一杯拿铁——怎么操作咖啡机，怎么打奶泡。这种记忆需要反复练习才能形成，但一旦学会了就很难忘记，就像骑自行车一样。它解决How的问题。
+有意思的是，当我们想到“拿铁”这个词的时候，这三种记忆往往会同时被激活：我们知道它是什么（语义记忆），可能想起某次喝拿铁的经历（情景记忆），还知道怎么制作它（程序性记忆）。它们共同构成了我们对一个事物的完整认识。
+我还做了一个思维导图，可以从文件里下载查看。"><meta property="og:locale" content="chs"><meta property="og:type" content="article"><meta property="article:section" content="know_how"><meta property="article:published_time" content="2025-11-27T13:55:11+00:00"><meta property="article:modified_time" content="2025-11-27T13:55:11+00:00"><meta property="article:tag" content="Tech"><meta name=twitter:card content="summary"><meta name=twitter:title content="2025-11-27 人脑的记忆和Agent的记忆是完全不同的"><meta name=twitter:description content="最近在看 Agent 记忆的一些设计，调研了4个流行的框架（MEM0、LangGraph、ZeP、ADK）之后，我发现这些框架在记忆部分其实都比较雷同——无论是短期记忆还是长期记忆，本质上都是引入一些外部知识，或者增加一个数据存储层。
+短期记忆一般指当前会话中出现的消息、临时变量和当前状态，它只在当前运行的线程或 session 内有效。
+长期记忆则是经过 LLM 提炼后的一些事实、事件或语义关系，是更持久的信息，对未来其他会话也可见。
+在这个过程中，我比较关注的是短期记忆如何转化为长期记忆。结果发现，最后一步仍然需要依赖大模型来做转换。也就是说，只要明确定义好长期记忆和短期记忆的结构，就可以在对话中实现这种转化。
+之后我又去调研了一下人脑的记忆机制，发现 Agent 的记忆和人脑记忆其实是完全不同的。Agent 的记忆只能说强行模仿人类记忆的分类方式，分为短期和长期，但只是套了个壳子，内部运行机制完全不一样。人脑处理记忆是一个极其复杂的生物学过程，记忆的载体是神经元和突触之间的连接。
+如果人类是唯一有智能的生物，那么 AIGC的路还远着呢！
+一、记忆的形成和存储 记忆的形成和存储大致可以分为三个阶段：
+通过编码初步获取信息 编码是记忆形成的第一步，指将外界的感觉信息（视觉、听觉、触觉等）转化为大脑可以处理和存储的神经表征。这个过程是高度选择性的，并不是所有进入感官的信息都会被编码。注意力在其中起到关键作用，它决定了哪些信息能优先进入工作记忆或短期记忆。比如在咖啡馆，你能专注于和朋友的对话，而忽略周围的背景噪音。 编码的深度和质量会直接影响记忆的强度和持久性。深层次的理解和与已有知识的联系，比机械重复更能促进长期记忆的形成。
+通过巩固来强化记忆 巩固是指新形成的不稳定记忆痕迹逐渐转变为稳定、持久的长期记忆的过程。它分为两个层面：突触巩固和系统巩固。突触巩固发生在学习后的几分钟到几小时内，主要涉及突触连接的局部生化改变，比如长时程增强（LTP）的诱导和维持。系统巩固则更缓慢，可能持续数周到数年，涉及记忆在不同脑区之间的重新组织和转移。
+分布式按功能存储记忆 存储是指记忆信息在大脑中被长期保持的过程。记忆并非存储在单一位置，而是分布式地存储于由大量神经元相互连接构成的复杂神经回路中，其核心是突触结构的改变。
+例如，对一个朋友的记忆，可能包括面孔（存储在颞叶的视觉皮层）、名字（存储在语言相关区域）、声音（存储在听觉皮层）以及情感（存储在杏仁核等边缘系统结构）等多个组成部分，它们通过神经连接整合在一起。
+二、短期记忆和长期记忆 短期记忆 短期记忆是指信息在大脑中保持几秒到一分钟左右的记忆系统。它的容量非常有限，通常认为只能同时存储几个信息单元（如数字、字母等）。短期记忆容量小、持续时间短，容易受干扰，主要作为信息处理的临时工作台，用于暂时保持和操作信息，指导当前的决策和行为。
+比如拨电话时，你会短暂记住一串号码，打完就忘。
+工作记忆是对短期记忆的拓展，它不仅包括信息的暂时存储，还包括对信息的加工和操作，比如心算或逻辑推理。
+长期记忆 长期记忆是指信息在大脑中保持数小时、数天、数年甚至终生的记忆系统。它的容量几乎是无限的，相对稳定，不易受干扰。长期记忆的形成需要将短期记忆中不稳定的神经活动模式转化为持久的、结构性的改变，这个过程就是巩固。
+长期记忆可以分为外显记忆和内隐记忆。外显记忆也叫陈述性记忆，包括对个人经历和事件的情景记忆，以及对事实、概念等知识的语义记忆。内隐记忆则包括程序性记忆（如技能和习惯）、启动效应等。这些不同类型的长期记忆依赖于不同的脑区网络。
+短期记忆是如何转化为长期记忆的？ 这个问题本身可能就不太准确，因为长期记忆不一定是短期记忆直接“转化”来的，更准确的说法是长期记忆的巩固。
+2017年MIT的研究表明，在学习事件发生时，记忆痕迹同时在海马体和大脑皮层的长期存储位置形成。但在早期，皮层中的记忆痕迹处于沉默状态，无法被主动提取。只有当这些痕迹逐渐成熟后，才能独立于海马体被提取。这说明记忆巩固不是简单的信息转移，而是海马体和皮层并行处理、相互作用的结果。
+传统的记忆巩固模型认为，新记忆最初依赖于海马体编码和短期存储，然后通过系统巩固逐渐转移到大脑皮层进行长期存储。
+除了海马体，睡眠（特别是慢波睡眠）在记忆巩固中也扮演着重要角色，它通过“重放”白天的学习经历来加强和稳定记忆痕迹。
+Agent 记忆借鉴人类记忆的部分 那么，Agent 记忆设计到底借鉴了人脑记忆的哪些部分？
+其实主要就是分类方式。Agent 也引入了外显记忆和内隐记忆的概念：外显记忆包括情景记忆和语义记忆，内隐记忆包括程序性记忆、启动效应等。
+情景记忆（Episodic Memory）就是记下某一次具体经历。比如“昨天下午在星巴克和王老师一起喝了杯拿铁”，这个记忆里包含了时间、地点、人物和当时的感受，主要解决When Where Who 这样的问题。
+语义记忆（Semantic Memory）则是关于事实的知识。比如“拿铁是咖啡和牛奶混合的饮料”，这个知识不依赖于某次具体经历，而是作为一个客观事实存在。它回答的是What的问题。这种记忆通常是从多次类似经历中慢慢提炼出来的。
+程序性记忆（Procedural Memory）是关于“怎么做”的记忆。比如你知道怎么冲泡一杯拿铁——怎么操作咖啡机，怎么打奶泡。这种记忆需要反复练习才能形成，但一旦学会了就很难忘记，就像骑自行车一样。它解决How的问题。
+有意思的是，当我们想到“拿铁”这个词的时候，这三种记忆往往会同时被激活：我们知道它是什么（语义记忆），可能想起某次喝拿铁的经历（情景记忆），还知道怎么制作它（程序性记忆）。它们共同构成了我们对一个事物的完整认识。
+我还做了一个思维导图，可以从文件里下载查看。"><meta itemprop=name content="2025-11-27 人脑的记忆和Agent的记忆是完全不同的"><meta itemprop=description content="最近在看 Agent 记忆的一些设计，调研了4个流行的框架（MEM0、LangGraph、ZeP、ADK）之后，我发现这些框架在记忆部分其实都比较雷同——无论是短期记忆还是长期记忆，本质上都是引入一些外部知识，或者增加一个数据存储层。
+短期记忆一般指当前会话中出现的消息、临时变量和当前状态，它只在当前运行的线程或 session 内有效。
+长期记忆则是经过 LLM 提炼后的一些事实、事件或语义关系，是更持久的信息，对未来其他会话也可见。
+在这个过程中，我比较关注的是短期记忆如何转化为长期记忆。结果发现，最后一步仍然需要依赖大模型来做转换。也就是说，只要明确定义好长期记忆和短期记忆的结构，就可以在对话中实现这种转化。
+之后我又去调研了一下人脑的记忆机制，发现 Agent 的记忆和人脑记忆其实是完全不同的。Agent 的记忆只能说强行模仿人类记忆的分类方式，分为短期和长期，但只是套了个壳子，内部运行机制完全不一样。人脑处理记忆是一个极其复杂的生物学过程，记忆的载体是神经元和突触之间的连接。
+如果人类是唯一有智能的生物，那么 AIGC的路还远着呢！
+一、记忆的形成和存储 记忆的形成和存储大致可以分为三个阶段：
+通过编码初步获取信息 编码是记忆形成的第一步，指将外界的感觉信息（视觉、听觉、触觉等）转化为大脑可以处理和存储的神经表征。这个过程是高度选择性的，并不是所有进入感官的信息都会被编码。注意力在其中起到关键作用，它决定了哪些信息能优先进入工作记忆或短期记忆。比如在咖啡馆，你能专注于和朋友的对话，而忽略周围的背景噪音。 编码的深度和质量会直接影响记忆的强度和持久性。深层次的理解和与已有知识的联系，比机械重复更能促进长期记忆的形成。
+通过巩固来强化记忆 巩固是指新形成的不稳定记忆痕迹逐渐转变为稳定、持久的长期记忆的过程。它分为两个层面：突触巩固和系统巩固。突触巩固发生在学习后的几分钟到几小时内，主要涉及突触连接的局部生化改变，比如长时程增强（LTP）的诱导和维持。系统巩固则更缓慢，可能持续数周到数年，涉及记忆在不同脑区之间的重新组织和转移。
+分布式按功能存储记忆 存储是指记忆信息在大脑中被长期保持的过程。记忆并非存储在单一位置，而是分布式地存储于由大量神经元相互连接构成的复杂神经回路中，其核心是突触结构的改变。
+例如，对一个朋友的记忆，可能包括面孔（存储在颞叶的视觉皮层）、名字（存储在语言相关区域）、声音（存储在听觉皮层）以及情感（存储在杏仁核等边缘系统结构）等多个组成部分，它们通过神经连接整合在一起。
+二、短期记忆和长期记忆 短期记忆 短期记忆是指信息在大脑中保持几秒到一分钟左右的记忆系统。它的容量非常有限，通常认为只能同时存储几个信息单元（如数字、字母等）。短期记忆容量小、持续时间短，容易受干扰，主要作为信息处理的临时工作台，用于暂时保持和操作信息，指导当前的决策和行为。
+比如拨电话时，你会短暂记住一串号码，打完就忘。
+工作记忆是对短期记忆的拓展，它不仅包括信息的暂时存储，还包括对信息的加工和操作，比如心算或逻辑推理。
+长期记忆 长期记忆是指信息在大脑中保持数小时、数天、数年甚至终生的记忆系统。它的容量几乎是无限的，相对稳定，不易受干扰。长期记忆的形成需要将短期记忆中不稳定的神经活动模式转化为持久的、结构性的改变，这个过程就是巩固。
+长期记忆可以分为外显记忆和内隐记忆。外显记忆也叫陈述性记忆，包括对个人经历和事件的情景记忆，以及对事实、概念等知识的语义记忆。内隐记忆则包括程序性记忆（如技能和习惯）、启动效应等。这些不同类型的长期记忆依赖于不同的脑区网络。
+短期记忆是如何转化为长期记忆的？ 这个问题本身可能就不太准确，因为长期记忆不一定是短期记忆直接“转化”来的，更准确的说法是长期记忆的巩固。
+2017年MIT的研究表明，在学习事件发生时，记忆痕迹同时在海马体和大脑皮层的长期存储位置形成。但在早期，皮层中的记忆痕迹处于沉默状态，无法被主动提取。只有当这些痕迹逐渐成熟后，才能独立于海马体被提取。这说明记忆巩固不是简单的信息转移，而是海马体和皮层并行处理、相互作用的结果。
+传统的记忆巩固模型认为，新记忆最初依赖于海马体编码和短期存储，然后通过系统巩固逐渐转移到大脑皮层进行长期存储。
+除了海马体，睡眠（特别是慢波睡眠）在记忆巩固中也扮演着重要角色，它通过“重放”白天的学习经历来加强和稳定记忆痕迹。
+Agent 记忆借鉴人类记忆的部分 那么，Agent 记忆设计到底借鉴了人脑记忆的哪些部分？
+其实主要就是分类方式。Agent 也引入了外显记忆和内隐记忆的概念：外显记忆包括情景记忆和语义记忆，内隐记忆包括程序性记忆、启动效应等。
+情景记忆（Episodic Memory）就是记下某一次具体经历。比如“昨天下午在星巴克和王老师一起喝了杯拿铁”，这个记忆里包含了时间、地点、人物和当时的感受，主要解决When Where Who 这样的问题。
+语义记忆（Semantic Memory）则是关于事实的知识。比如“拿铁是咖啡和牛奶混合的饮料”，这个知识不依赖于某次具体经历，而是作为一个客观事实存在。它回答的是What的问题。这种记忆通常是从多次类似经历中慢慢提炼出来的。
+程序性记忆（Procedural Memory）是关于“怎么做”的记忆。比如你知道怎么冲泡一杯拿铁——怎么操作咖啡机，怎么打奶泡。这种记忆需要反复练习才能形成，但一旦学会了就很难忘记，就像骑自行车一样。它解决How的问题。
+有意思的是，当我们想到“拿铁”这个词的时候，这三种记忆往往会同时被激活：我们知道它是什么（语义记忆），可能想起某次喝拿铁的经历（情景记忆），还知道怎么制作它（程序性记忆）。它们共同构成了我们对一个事物的完整认识。
+我还做了一个思维导图，可以从文件里下载查看。"><meta itemprop=datePublished content="2025-11-27T13:55:11+00:00"><meta itemprop=dateModified content="2025-11-27T13:55:11+00:00"><meta itemprop=wordCount content="56"><meta itemprop=keywords content="Tech"><meta name=lang content="chs"></head><body class="dark:bg-gray-800 dark:text-white relative flex flex-col min-h-screen"><header class="container flex justify-between md:justify-between gap-4 flex-wrap p-6 mx-auto relative"><a href=https://huizhixu.github.io/chs/ class="capitalize font-extrabold text-2xl"><img src=../../../blist-logo.png alt=徐慧志的个人博客 class="h-8 max-w-full">
+</a><button class="mobile-menu-button md:hidden">
+<svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></button><ul class="mobile-menu absolute z-10 px-6 pb-6 md:p-0 top-full left-0 w-full md:w-auto md:relative hidden md:flex flex-col md:flex-row items-end md:items-center gap-4 lg:gap-6 bg-white dark:bg-gray-800"><li><a href=../../../chs/know_how/>技术</a></li><li><a href=../../../chs/life/>生活见闻</a></li><li><a href=../../../chs/page/about/>关于</a></li><li><a href=../../../chs/link/>宝藏集结</a></li><li><a href=../../../chs/tags/>分类</a></li><li class="relative cursor-pointer"><span class="language-switcher flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><line x1="3.6" y1="9" x2="20.4" y2="9"/><line x1="3.6" y1="15" x2="20.4" y2="15"/><path d="M11.5 3a17 17 0 000 18"/><path d="M12.5 3a17 17 0 010 18"/></svg>
+<a>语言</a>
+<svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12" transform="rotate(180 12 12)"/></svg></span><div class="language-dropdown absolute top-full mt-2 left-0 flex-col gap-2 bg-gray-100 dark:bg-gray-900 dark:text-white z-10 hidden"><a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../../en/ lang=en>English</a>
+<a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../../de/ lang=de>Deutsch</a></div></li><li class="grid place-items-center"><span class="open-search inline-block cursor-pointer"><svg width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg></span></li><li class="grid place-items-center"><span class="toggle-dark-mode inline-block cursor-pointer"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="5" x2="12" y2="5.01"/><line x1="17" y1="7" x2="17" y2="7.01"/><line x1="19" y1="12" x2="19" y2="12.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="12" y1="19" x2="12" y2="19.01"/><line x1="7" y1="17" x2="7" y2="17.01"/><line x1="5" y1="12" x2="5" y2="12.01"/><line x1="7" y1="7" x2="7" y2="7.01"/></svg></span></li></ul></header><main class=flex-1><article class="prose lg:prose-lg mx-auto my-8 dark:prose-dark px-4"><h1 class="text-2xl font-bold mb-2">2025-11-27 人脑的记忆和Agent的记忆是完全不同的</h1><h5 class="text-sm flex items-center flex-wrap"><svg class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/><rect x="8" y="15" width="2" height="2"/></svg>
+发布于
+2025年11月27日
+&nbsp;&bull;&nbsp;
+<svg class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+1&nbsp;分钟
+&nbsp;&bull;
+<svg class="mx-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 019 0 9 9 0 019 0"/><path d="M3 6a9 9 0 019 0 9 9 0 019 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/></svg>
+56&nbsp;字</h5><details id=TableOfContents class="px-4 mt-4 bg-gray-100 dark:bg-gray-700 rounded toc"><summary class="flex items-center font-bold py-2 px-4 cursor-pointer justify-between select-none text-black dark:text-white"><span>Table of contents</span>
+<svg class="icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="6 9 12 15 18 9"/></svg></summary><ul class="mt-2 pb-4"><li><a href=#%e4%b8%80%e8%ae%b0%e5%bf%86%e7%9a%84%e5%bd%a2%e6%88%90%e5%92%8c%e5%ad%98%e5%82%a8>一、记忆的形成和存储</a></li><li><a href=#%e4%ba%8c%e7%9f%ad%e6%9c%9f%e8%ae%b0%e5%bf%86%e5%92%8c%e9%95%bf%e6%9c%9f%e8%ae%b0%e5%bf%86>二、短期记忆和长期记忆</a><ul><li><a href=#%e7%9f%ad%e6%9c%9f%e8%ae%b0%e5%bf%86>短期记忆</a></li><li><a href=#%e9%95%bf%e6%9c%9f%e8%ae%b0%e5%bf%86>长期记忆</a></li><li><a href=#%e7%9f%ad%e6%9c%9f%e8%ae%b0%e5%bf%86%e6%98%af%e5%a6%82%e4%bd%95%e8%bd%ac%e5%8c%96%e4%b8%ba%e9%95%bf%e6%9c%9f%e8%ae%b0%e5%bf%86%e7%9a%84>短期记忆是如何转化为长期记忆的？</a></li></ul></li><li><a href=#agent-%e8%ae%b0%e5%bf%86%e5%80%9f%e9%89%b4%e4%ba%ba%e7%b1%bb%e8%ae%b0%e5%bf%86%e7%9a%84%e9%83%a8%e5%88%86>Agent 记忆借鉴人类记忆的部分</a></li></ul></details><p>最近在看 Agent 记忆的一些设计，调研了4个流行的框架（MEM0、LangGraph、ZeP、ADK）之后，我发现这些框架在记忆部分其实都比较雷同——无论是短期记忆还是长期记忆，本质上都是引入一些外部知识，或者增加一个数据存储层。</p><p>短期记忆一般指当前会话中出现的消息、临时变量和当前状态，它只在当前运行的线程或 session 内有效。</p><p>长期记忆则是经过 LLM 提炼后的一些事实、事件或语义关系，是更持久的信息，对未来其他会话也可见。</p><p>在这个过程中，我比较关注的是短期记忆如何转化为长期记忆。结果发现，最后一步仍然需要依赖大模型来做转换。也就是说，只要明确定义好长期记忆和短期记忆的结构，就可以在对话中实现这种转化。</p><p>之后我又去调研了一下人脑的记忆机制，发现 Agent 的记忆和人脑记忆其实是完全不同的。Agent 的记忆只能说强行模仿人类记忆的分类方式，分为短期和长期，但只是套了个壳子，内部运行机制完全不一样。人脑处理记忆是一个极其复杂的生物学过程，记忆的载体是神经元和突触之间的连接。</p><p>如果人类是唯一有智能的生物，那么 AIGC的路还远着呢！</p><h2 id=一记忆的形成和存储>一、记忆的形成和存储</h2><p>记忆的形成和存储大致可以分为三个阶段：</p><ol><li>通过编码初步获取信息
+编码是记忆形成的第一步，指将外界的感觉信息（视觉、听觉、触觉等）转化为大脑可以处理和存储的神经表征。这个过程是高度选择性的，并不是所有进入感官的信息都会被编码。注意力在其中起到关键作用，它决定了哪些信息能优先进入工作记忆或短期记忆。比如在咖啡馆，你能专注于和朋友的对话，而忽略周围的背景噪音。</li></ol><p>编码的深度和质量会直接影响记忆的强度和持久性。深层次的理解和与已有知识的联系，比机械重复更能促进长期记忆的形成。</p><ol><li><p>通过巩固来强化记忆
+巩固是指新形成的不稳定记忆痕迹逐渐转变为稳定、持久的长期记忆的过程。它分为两个层面：突触巩固和系统巩固。突触巩固发生在学习后的几分钟到几小时内，主要涉及突触连接的局部生化改变，比如长时程增强（LTP）的诱导和维持。系统巩固则更缓慢，可能持续数周到数年，涉及记忆在不同脑区之间的重新组织和转移。</p></li><li><p>分布式按功能存储记忆
+存储是指记忆信息在大脑中被长期保持的过程。记忆并非存储在单一位置，而是分布式地存储于由大量神经元相互连接构成的复杂神经回路中，其核心是突触结构的改变。</p></li></ol><p>例如，对一个朋友的记忆，可能包括面孔（存储在颞叶的视觉皮层）、名字（存储在语言相关区域）、声音（存储在听觉皮层）以及情感（存储在杏仁核等边缘系统结构）等多个组成部分，它们通过神经连接整合在一起。</p><h2 id=二短期记忆和长期记忆>二、短期记忆和长期记忆</h2><h3 id=短期记忆>短期记忆</h3><p>短期记忆是指信息在大脑中保持几秒到一分钟左右的记忆系统。它的容量非常有限，通常认为只能同时存储几个信息单元（如数字、字母等）。短期记忆容量小、持续时间短，容易受干扰，主要作为信息处理的临时工作台，用于暂时保持和操作信息，指导当前的决策和行为。</p><p>比如拨电话时，你会短暂记住一串号码，打完就忘。</p><p>工作记忆是对短期记忆的拓展，它不仅包括信息的暂时存储，还包括对信息的加工和操作，比如心算或逻辑推理。</p><h3 id=长期记忆>长期记忆</h3><p>长期记忆是指信息在大脑中保持数小时、数天、数年甚至终生的记忆系统。它的容量几乎是无限的，相对稳定，不易受干扰。长期记忆的形成需要将短期记忆中不稳定的神经活动模式转化为持久的、结构性的改变，这个过程就是巩固。</p><p>长期记忆可以分为外显记忆和内隐记忆。外显记忆也叫陈述性记忆，包括对个人经历和事件的情景记忆，以及对事实、概念等知识的语义记忆。内隐记忆则包括程序性记忆（如技能和习惯）、启动效应等。这些不同类型的长期记忆依赖于不同的脑区网络。</p><h3 id=短期记忆是如何转化为长期记忆的>短期记忆是如何转化为长期记忆的？</h3><p>这个问题本身可能就不太准确，因为长期记忆不一定是短期记忆直接“转化”来的，更准确的说法是长期记忆的巩固。</p><p>2017年MIT的研究表明，在学习事件发生时，记忆痕迹同时在海马体和大脑皮层的长期存储位置形成。但在早期，皮层中的记忆痕迹处于沉默状态，无法被主动提取。只有当这些痕迹逐渐成熟后，才能独立于海马体被提取。这说明记忆巩固不是简单的信息转移，而是海马体和皮层并行处理、相互作用的结果。</p><p>传统的记忆巩固模型认为，新记忆最初依赖于海马体编码和短期存储，然后通过系统巩固逐渐转移到大脑皮层进行长期存储。</p><p>除了海马体，睡眠（特别是慢波睡眠）在记忆巩固中也扮演着重要角色，它通过“重放”白天的学习经历来加强和稳定记忆痕迹。</p><h2 id=agent-记忆借鉴人类记忆的部分>Agent 记忆借鉴人类记忆的部分</h2><p>那么，Agent 记忆设计到底借鉴了人脑记忆的哪些部分？</p><p>其实主要就是分类方式。Agent 也引入了外显记忆和内隐记忆的概念：外显记忆包括情景记忆和语义记忆，内隐记忆包括程序性记忆、启动效应等。</p><p>情景记忆（Episodic Memory）就是记下某一次具体经历。比如“昨天下午在星巴克和王老师一起喝了杯拿铁”，这个记忆里包含了时间、地点、人物和当时的感受，主要解决When Where Who 这样的问题。</p><p>语义记忆（Semantic Memory）则是关于事实的知识。比如“拿铁是咖啡和牛奶混合的饮料”，这个知识不依赖于某次具体经历，而是作为一个客观事实存在。它回答的是What的问题。这种记忆通常是从多次类似经历中慢慢提炼出来的。</p><p>程序性记忆（Procedural Memory）是关于“怎么做”的记忆。比如你知道怎么冲泡一杯拿铁——怎么操作咖啡机，怎么打奶泡。这种记忆需要反复练习才能形成，但一旦学会了就很难忘记，就像骑自行车一样。它解决How的问题。</p><p>有意思的是，当我们想到“拿铁”这个词的时候，这三种记忆往往会同时被激活：我们知道它是什么（语义记忆），可能想起某次喝拿铁的经历（情景记忆），还知道怎么制作它（程序性记忆）。它们共同构成了我们对一个事物的完整认识。</p><p>我还做了一个思维导图，可以从文件里下载查看。</p></article><div class="px-2 mb-2"><script src=https://utteranc.es/client.js repo=HuizhiXu/huizhixu.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script></div><div class="bg-blue-100 dark:bg-gray-900"><div class="container px-4 py-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center"><div><div class="text-2xl font-bold mb-2">Sein heißt werden, leben heißt lernen.</div><p class=opacity-60>Der einfache Weg is immer verkehrt.</p></div><ul class="flex justify-center gap-x-3 flex-wrap gap-y-2"><li><a href=https://twitter.com/ target=_blank rel=noopener aria-label=Twitter class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li><li><a href=https://github.com/ target=_blank rel=noopener aria-label=GitHub class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ul></div></div></main><footer class="container p-6 mx-auto flex justify-between items-center"><span class="text-sm font-light">Copyright © 2012 - Huizhi Xu · All rights reserved
+</span><span onclick='window.scrollTo({top:0,behavior:"smooth"})' class="p-1 cursor-pointer"><svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12"/></svg></span></footer><div class="search-ui absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-800 hidden"><div class="container max-w-3xl mx-auto p-12"><div class=relative><div class="my-4 text-center text-2xl font-bold">Search</div><span class="p-2 absolute right-0 top-0 cursor-pointer close-search"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><input type=search class="py-2 px-3 w-full dark:text-black border dark:border-transparent" placeholder="Enter search query"><div class="search-results text-lg font-medium my-4 hidden">Results</div><ul class="search-list my-2"></ul><div class="no-results text-center my-8 hidden"><div class="text-xl font-semibold mb-2">No results found</div><p class="font-light text-sm">Try adjusting your search query</p></div></div></div><script src=https://huizhixu.github.io/js/scripts.min.js></script><script>const languageMenuButton=document.querySelector(".language-switcher"),languageDropdown=document.querySelector(".language-dropdown");languageMenuButton.addEventListener("click",e=>{e.preventDefault(),languageDropdown.classList.contains("hidden")?(languageDropdown.classList.remove("hidden"),languageDropdown.classList.add("flex")):(languageDropdown.classList.add("hidden"),languageDropdown.classList.remove("flex"))})</script><script>const darkmode=document.querySelector(".toggle-dark-mode");function toggleDarkMode(){document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("darkmode","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("darkmode","dark"))}darkmode&&darkmode.addEventListener("click",toggleDarkMode);const darkStorage=localStorage.getItem("darkmode"),isBrowserDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;!darkStorage&&isBrowserDark&&document.documentElement.classList.add("dark"),darkStorage&&darkStorage==="dark"&&toggleDarkMode()</script><script>const mobileMenuButton=document.querySelector(".mobile-menu-button"),mobileMenu=document.querySelector(".mobile-menu");function toggleMenu(){mobileMenu.classList.toggle("hidden"),mobileMenu.classList.toggle("flex")}mobileMenu&&mobileMenuButton&&mobileMenuButton.addEventListener("click",toggleMenu)</script></body></html>
