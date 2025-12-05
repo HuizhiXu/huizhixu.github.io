@@ -42,7 +42,7 @@ Claude 4 模型在调用工具（tool calls）时，不把“思考过程”一�
 整个“思考—调用工具—再思考—再调用……”的流程像齿轮交错一样穿插进行，而不是传统的“先一口气想好所有步骤，再连续执行”。
 Multi Agent的优劣势
 为什么研究性的工作适合用Multi Agent 来做？
-因为研究工作主要涉及开放性的问题，研究者会根据在研究过程中出现的线索，持续更新自己的研究方法。'><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.4d869f61f0cc1665da726eb0f36447acfb4e8c37287b6271224d075b829ba358.css" integrity crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/chs/know_how/20250910anthropic-%E5%81%9A-multi-agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%BB%8F%E9%AA%8C/"><meta property="og:site_name" content="徐慧志的个人博客"><meta property="og:title" content="Anthropic 做 Multi Agent系统的工程经验"><meta property="og:description" content='从ChatGPT时代到现在，大家逐渐达成共识：大模型的应用核心不是算法问题，而是工程问题。大模型本身作为基础设施已经就位，关键在于如何通过工程手段解决记忆存储、上下文管理、工具调用和提示词优化等实际问题。
+因为研究工作主要涉及开放性的问题，研究者会根据在研究过程中出现的线索，持续更新自己的研究方法。'><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.cc1204abf55b2794a944c9970dcfbbedd8cddb0c0451f7d9b088371efe0b6248.css" integrity crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/chs/know_how/20250910anthropic-%E5%81%9A-multi-agent%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%BB%8F%E9%AA%8C/"><meta property="og:site_name" content="徐慧志的个人博客"><meta property="og:title" content="Anthropic 做 Multi Agent系统的工程经验"><meta property="og:description" content='从ChatGPT时代到现在，大家逐渐达成共识：大模型的应用核心不是算法问题，而是工程问题。大模型本身作为基础设施已经就位，关键在于如何通过工程手段解决记忆存储、上下文管理、工具调用和提示词优化等实际问题。
 最近读了Anthropic关于多智能体系统的工程实践， 感觉很有意思，所以分享出来。这一篇将解析：
 Multi Agent的架构设计（Orchestrator-Worker模式） Multi Agent的优劣势 提示工程实践（8条 Anthropic 核心经验） 下一篇写Anthropic的智能体评估、产品可靠性和工程挑战。
 Multi Agent 的架构 Orchestrator-Worker模式解析 Anthropic采用orchestrator-worker架构模式。
