@@ -2,14 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://huizhixu.github.io/chs/know_how/20251204-does-reinforcement-learning-really-incentivize-reasoning-capacity-in-llms-beyond-the-base-model/</loc>
-    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
-  </url><url>
-    <loc>https://huizhixu.github.io/chs/tags/ai/</loc>
-    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
+    <loc>https://huizhixu.github.io/chs/know_how/20251210evermemos-%E6%A1%86%E6%9E%B6%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E8%AE%B0%E5%BF%86/</loc>
+    <lastmod>2025-12-10T13:52:05+00:00</lastmod>
   </url><url>
     <loc>https://huizhixu.github.io/chs/</loc>
-    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
+    <lastmod>2025-12-10T13:52:05+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -27,10 +24,10 @@
                 />
   </url><url>
     <loc>https://huizhixu.github.io/chs/know_how/</loc>
-    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
+    <lastmod>2025-12-10T13:52:05+00:00</lastmod>
   </url><url>
     <loc>https://huizhixu.github.io/chs/tags/</loc>
-    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
+    <lastmod>2025-12-10T13:52:05+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -48,10 +45,16 @@
                 />
   </url><url>
     <loc>https://huizhixu.github.io/chs/tags/tech/</loc>
+    <lastmod>2025-12-10T13:52:05+00:00</lastmod>
+  </url><url>
+    <loc>https://huizhixu.github.io/chs/know_how/20251204-does-reinforcement-learning-really-incentivize-reasoning-capacity-in-llms-beyond-the-base-model/</loc>
+    <lastmod>2025-12-04T11:26:18+00:00</lastmod>
+  </url><url>
+    <loc>https://huizhixu.github.io/chs/tags/ai/</loc>
     <lastmod>2025-12-04T11:26:18+00:00</lastmod>
   </url><url>
     <loc>https://huizhixu.github.io/chs/know_how/20251127-%E4%BA%BA%E8%84%91%E7%9A%84%E8%AE%B0%E5%BF%86%E5%92%8Cagent%E7%9A%84%E8%AE%B0%E5%BF%86%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E5%90%8C%E7%9A%84/</loc>
-    <lastmod>2025-11-27T11:26:16+00:00</lastmod>
+    <lastmod>2025-11-27T13:52:03+00:00</lastmod>
   </url><url>
     <loc>https://huizhixu.github.io/chs/tags/2025/</loc>
     <lastmod>2025-11-18T14:11:34+00:00</lastmod>
