@@ -1,4 +1,14 @@
-<!doctype html><html lang=chs itemscope itemtype=http://schema.org/WebPage><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=../../../favicon.svg><title>2025-09-14 从零构建大模型—在无监督数据上进行预训练 - 徐慧志的个人博客</title><meta name=description content='这一章主要分为以下三个部分：
+<!DOCTYPE html>
+<html lang="chs" itemscope itemtype="http://schema.org/WebPage"><head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="../../../favicon.svg">
+
+  <title>
+  2025-09-14 从零构建大模型—在无监督数据上进行预训练 - 徐慧志的个人博客
+  </title>
+  <meta name="description" content="这一章主要分为以下三个部分：
 
 评估生成文本的质量
 训练函数
@@ -27,13 +37,13 @@ PyTorch允许通过model.parameters()方法直接访问模型的所有可训练�
 from gpt2_module.gpt2 import GPTModel
 
 GPT_CONFIG_124M ={
-    "vocab_size":50257,
-    "context_length":1024,
-    "emb_dim":768,
-    "n_heads":12,
-    "n_layers":12,
-    "drop_rate":0.1,
-    "qkv_bias":False
+    &#34;vocab_size&#34;:50257,
+    &#34;context_length&#34;:1024,
+    &#34;emb_dim&#34;:768,
+    &#34;n_heads&#34;:12,
+    &#34;n_layers&#34;:12,
+    &#34;drop_rate&#34;:0.1,
+    &#34;qkv_bias&#34;:False
 }
 
 def generate_text_simple(model, idx, max_new_tokens, context_size):
@@ -53,7 +63,7 @@ def generate_text_simple(model, idx, max_new_tokens, context_size):
     return idx
 
 def text_to_token_ids(text, tokenizer):
-    encoded = tokenizer.encode(text, allowed_special={&#39;<|endoftext|>&#39;})
+    encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;})
     encoded_tensor = torch.tensor(encoded).unsqueeze(0)
     return encoded_tensor
 
@@ -61,8 +71,8 @@ def token_ids_to_text(token_ids, tokenizer):
     flat = token_ids.squeeze(0)
     return tokenizer.decode(flat.tolist())
 
-start_context = "Every effort moves you"
-tokenizer = tiktoken.get_encoding("gpt2")
+start_context = &#34;Every effort moves you&#34;
+tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;)
 
 model = GPTModel(GPT_CONFIG_124M)
 
@@ -70,12 +80,25 @@ token_ids = generate_text_simple(
     model=model,
     idx=text_to_token_ids(start_context, tokenizer),
     max_new_tokens=10,
-    context_size=GPT_CONFIG_124M["context_length"]
+    context_size=GPT_CONFIG_124M[&#34;context_length&#34;]
 )
 
 print(token_ids_to_text(token_ids, tokenizer))
 交叉熵损失的计算
-模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。'><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.cc1204abf55b2794a944c9970dcfbbedd8cddb0c0451f7d9b088371efe0b6248.css" integrity crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/chs/know_how/20250914%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9C%A8%E6%97%A0%E7%9B%91%E7%9D%A3%E6%95%B0%E6%8D%AE%E4%B8%8A%E8%BF%9B%E8%A1%8C%E9%A2%84%E8%AE%AD%E7%BB%83/"><meta property="og:site_name" content="徐慧志的个人博客"><meta property="og:title" content="2025-09-14 从零构建大模型—在无监督数据上进行预训练"><meta property="og:description" content='这一章主要分为以下三个部分：
+模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。" /><meta name="generator" content="Hugo 0.135.0"><link
+    rel="stylesheet"
+    href="/css/styles.min.9af39941a3807f10eba8dd56da5fe9f28076ed2722ec76c1aa643b6d55afedbd.css"
+    integrity=""
+    crossorigin="anonymous"
+  />
+  
+  
+
+  
+  <meta property="og:url" content="https://huizhixu.github.io/chs/know_how/20250914%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9C%A8%E6%97%A0%E7%9B%91%E7%9D%A3%E6%95%B0%E6%8D%AE%E4%B8%8A%E8%BF%9B%E8%A1%8C%E9%A2%84%E8%AE%AD%E7%BB%83/">
+  <meta property="og:site_name" content="徐慧志的个人博客">
+  <meta property="og:title" content="2025-09-14 从零构建大模型—在无监督数据上进行预训练">
+  <meta property="og:description" content="这一章主要分为以下三个部分：
 评估生成文本的质量 训练函数 对大模型进行预训练 一、前情提要 文本生成（前几章讲过的） 步骤：
 分词器将输入文本转换成一系列词元ID 模型接收词元ID，并生成相应的logits 这些logits被转换回词元ID，分词器会将其解码为人类可读的文本 logits是表示词汇表中每个词元的概率分布的向量。 logits 怎么理解：
 logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。
@@ -84,7 +107,18 @@ logits 的用途：
 权重参数 权重参数指的是在训练过程调整的参数。
 PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）
 二、评估文本生成 初始化 用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。
-from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ "vocab_size":50257, "context_length":1024, "emb_dim":768, "n_heads":12, "n_layers":12, "drop_rate":0.1, "qkv_bias":False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;<|endoftext|>&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = "Every effort moves you" tokenizer = tiktoken.get_encoding("gpt2") model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M["context_length"] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。'><meta property="og:locale" content="chs"><meta property="og:type" content="article"><meta property="article:section" content="know_how"><meta property="article:published_time" content="2025-09-14T13:54:05+00:00"><meta property="article:modified_time" content="2025-09-14T13:54:05+00:00"><meta property="article:tag" content="Tech"><meta name=twitter:card content="summary"><meta name=twitter:title content="2025-09-14 从零构建大模型—在无监督数据上进行预训练"><meta name=twitter:description content='这一章主要分为以下三个部分：
+from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ &#34;vocab_size&#34;:50257, &#34;context_length&#34;:1024, &#34;emb_dim&#34;:768, &#34;n_heads&#34;:12, &#34;n_layers&#34;:12, &#34;drop_rate&#34;:0.1, &#34;qkv_bias&#34;:False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = &#34;Every effort moves you&#34; tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;) model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M[&#34;context_length&#34;] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。">
+  <meta property="og:locale" content="chs">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="know_how">
+    <meta property="article:published_time" content="2025-09-14T13:54:05+00:00">
+    <meta property="article:modified_time" content="2025-09-14T13:54:05+00:00">
+    <meta property="article:tag" content="Tech">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2025-09-14 从零构建大模型—在无监督数据上进行预训练">
+  <meta name="twitter:description" content="这一章主要分为以下三个部分：
 评估生成文本的质量 训练函数 对大模型进行预训练 一、前情提要 文本生成（前几章讲过的） 步骤：
 分词器将输入文本转换成一系列词元ID 模型接收词元ID，并生成相应的logits 这些logits被转换回词元ID，分词器会将其解码为人类可读的文本 logits是表示词汇表中每个词元的概率分布的向量。 logits 怎么理解：
 logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。
@@ -93,7 +127,11 @@ logits 的用途：
 权重参数 权重参数指的是在训练过程调整的参数。
 PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）
 二、评估文本生成 初始化 用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。
-from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ "vocab_size":50257, "context_length":1024, "emb_dim":768, "n_heads":12, "n_layers":12, "drop_rate":0.1, "qkv_bias":False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;<|endoftext|>&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = "Every effort moves you" tokenizer = tiktoken.get_encoding("gpt2") model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M["context_length"] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。'><meta itemprop=name content="2025-09-14 从零构建大模型—在无监督数据上进行预训练"><meta itemprop=description content='这一章主要分为以下三个部分：
+from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ &#34;vocab_size&#34;:50257, &#34;context_length&#34;:1024, &#34;emb_dim&#34;:768, &#34;n_heads&#34;:12, &#34;n_layers&#34;:12, &#34;drop_rate&#34;:0.1, &#34;qkv_bias&#34;:False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = &#34;Every effort moves you&#34; tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;) model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M[&#34;context_length&#34;] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。">
+
+  
+  <meta itemprop="name" content="2025-09-14 从零构建大模型—在无监督数据上进行预训练">
+  <meta itemprop="description" content="这一章主要分为以下三个部分：
 评估生成文本的质量 训练函数 对大模型进行预训练 一、前情提要 文本生成（前几章讲过的） 步骤：
 分词器将输入文本转换成一系列词元ID 模型接收词元ID，并生成相应的logits 这些logits被转换回词元ID，分词器会将其解码为人类可读的文本 logits是表示词汇表中每个词元的概率分布的向量。 logits 怎么理解：
 logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。
@@ -102,325 +140,945 @@ logits 的用途：
 权重参数 权重参数指的是在训练过程调整的参数。
 PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）
 二、评估文本生成 初始化 用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。
-from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ "vocab_size":50257, "context_length":1024, "emb_dim":768, "n_heads":12, "n_layers":12, "drop_rate":0.1, "qkv_bias":False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;<|endoftext|>&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = "Every effort moves you" tokenizer = tiktoken.get_encoding("gpt2") model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M["context_length"] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。'><meta itemprop=datePublished content="2025-09-14T13:54:05+00:00"><meta itemprop=dateModified content="2025-09-14T13:54:05+00:00"><meta itemprop=wordCount content="1119"><meta itemprop=keywords content="Tech"><meta name=lang content="chs"></head><body class="dark:bg-gray-800 dark:text-white relative flex flex-col min-h-screen"><header class="container flex justify-between md:justify-between gap-4 flex-wrap p-6 mx-auto relative"><a href=https://huizhixu.github.io/chs/ class="capitalize font-extrabold text-2xl"><img src=../../../blist-logo.png alt=徐慧志的个人博客 class="h-8 max-w-full">
-</a><button class="mobile-menu-button md:hidden">
-<svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></button><ul class="mobile-menu absolute z-10 px-6 pb-6 md:p-0 top-full left-0 w-full md:w-auto md:relative hidden md:flex flex-col md:flex-row items-end md:items-center gap-4 lg:gap-6 bg-white dark:bg-gray-800"><li><a href=../../../chs/know_how/>技术</a></li><li><a href=../../../chs/life/>生活见闻</a></li><li><a href=../../../chs/page/about/>关于</a></li><li><a href=../../../chs/link/>宝藏集结</a></li><li><a href=../../../chs/tags/>分类</a></li><li class="relative cursor-pointer"><span class="language-switcher flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><line x1="3.6" y1="9" x2="20.4" y2="9"/><line x1="3.6" y1="15" x2="20.4" y2="15"/><path d="M11.5 3a17 17 0 000 18"/><path d="M12.5 3a17 17 0 010 18"/></svg>
-<a>语言</a>
-<svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12" transform="rotate(180 12 12)"/></svg></span><div class="language-dropdown absolute top-full mt-2 left-0 flex-col gap-2 bg-gray-100 dark:bg-gray-900 dark:text-white z-10 hidden"><a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../../en/ lang=en>English</a>
-<a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../../de/ lang=de>Deutsch</a></div></li><li class="grid place-items-center"><span class="open-search inline-block cursor-pointer"><svg width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg></span></li><li class="grid place-items-center"><span class="toggle-dark-mode inline-block cursor-pointer"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="5" x2="12" y2="5.01"/><line x1="17" y1="7" x2="17" y2="7.01"/><line x1="19" y1="12" x2="19" y2="12.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="12" y1="19" x2="12" y2="19.01"/><line x1="7" y1="17" x2="7" y2="17.01"/><line x1="5" y1="12" x2="5" y2="12.01"/><line x1="7" y1="7" x2="7" y2="7.01"/></svg></span></li></ul></header><main class=flex-1><article class="prose lg:prose-lg mx-auto my-8 dark:prose-dark px-4"><h1 class="text-2xl font-bold mb-2">2025-09-14 从零构建大模型—在无监督数据上进行预训练</h1><h5 class="text-sm flex items-center flex-wrap"><svg class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/><rect x="8" y="15" width="2" height="2"/></svg>
-发布于
-2025年09月14日
-&nbsp;&bull;&nbsp;
-<svg class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-6&nbsp;分钟
-&nbsp;&bull;
-<svg class="mx-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 019 0 9 9 0 019 0"/><path d="M3 6a9 9 0 019 0 9 9 0 019 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/></svg>
-1119&nbsp;字</h5><details id=TableOfContents class="px-4 mt-4 bg-gray-100 dark:bg-gray-700 rounded toc"><summary class="flex items-center font-bold py-2 px-4 cursor-pointer justify-between select-none text-black dark:text-white"><span>Table of contents</span>
-<svg class="icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="6 9 12 15 18 9"/></svg></summary><ul class="mt-2 pb-4"><li><a href=#%e4%b8%80%e5%89%8d%e6%83%85%e6%8f%90%e8%a6%81>一、前情提要</a><ul><li><a href=#%e6%96%87%e6%9c%ac%e7%94%9f%e6%88%90%e5%89%8d%e5%87%a0%e7%ab%a0%e8%ae%b2%e8%bf%87%e7%9a%84>文本生成（前几章讲过的）</a></li><li><a href=#%e6%9d%83%e9%87%8d%e5%8f%82%e6%95%b0>权重参数</a></li></ul></li><li><a href=#%e4%ba%8c%e8%af%84%e4%bc%b0%e6%96%87%e6%9c%ac%e7%94%9f%e6%88%90>二、评估文本生成</a><ul><li><a href=#%e5%88%9d%e5%a7%8b%e5%8c%96>初始化</a></li><li><a href=#%e4%ba%a4%e5%8f%89%e7%86%b5%e6%8d%9f%e5%a4%b1%e7%9a%84%e8%ae%a1%e7%ae%97>交叉熵损失的计算</a></li><li><a href=#%e5%8f%8d%e5%90%91%e4%bc%a0%e6%92%ad>反向传播</a></li><li><a href=#%e5%85%b3%e4%ba%8e%e4%ba%a4%e5%8f%89%e7%86%b5%e6%8d%9f%e5%a4%b1%e7%9a%84%e7%90%86%e8%a7%a3>关于交叉熵损失的理解</a></li><li><a href=#%e5%9b%b0%e6%83%91%e5%ba%a6>困惑度</a></li></ul></li><li><a href=#%e4%b8%89%e8%ae%ad%e7%bb%83>三、训练</a><ul><li><a href=#%e8%af%ad%e6%96%99>语料</a></li><li><a href=#epoch>epoch</a></li><li><a href=#%e5%92%8c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e8%ae%ad%e7%bb%83%e4%b8%8d%e4%b8%80%e6%a0%b7%e7%9a%84%e5%9c%b0%e6%96%b9>和深度学习训练不一样的地方</a></li><li><a href=#%e7%bb%93%e6%9e%9c>结果</a><ul><li><a href=#%e6%94%b9%e8%bf%9b>改进</a></li><li><a href=#%e8%ae%ad%e7%bb%83trace>训练Trace</a></li><li><a href=#%e8%ae%ad%e7%bb%83%e8%84%9a%e6%9c%ac>训练脚本</a></li></ul></li></ul></li></ul></details><p>这一章主要分为以下三个部分：</p><ul><li>评估生成文本的质量</li><li>训练函数</li><li>对大模型进行预训练</li></ul><h1 id=一前情提要>一、前情提要</h1><h2 id=文本生成前几章讲过的>文本生成（前几章讲过的）</h2><p>步骤：</p><ol><li>分词器将输入文本转换成一系列词元ID</li><li>模型接收词元ID，并生成相应的logits</li><li>这些logits被转换回词元ID，分词器会将其解码为人类可读的文本
-logits是表示词汇表中每个词元的概率分布的向量。</li></ol><p>logits 怎么理解：</p><p>logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。</p><p>logits 的用途：</p><p>在推理阶段，取 logits 的 argmax 即可得到每个位置最可能的词元；也可以对 logits 应用温度缩放、Top-K、核采样等技术，再做 multinomial 采样，以平衡多样性与一致性。</p><h2 id=权重参数>权重参数</h2><p>权重参数指的是在训练过程调整的参数。</p><p>PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）</p><h1 id=二评估文本生成>二、评估文本生成</h1><h2 id=初始化>初始化</h2><p>用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plain data-lang=plain><span style=display:flex><span>
-</span></span><span style=display:flex><span>from gpt2_module.gpt2 import GPTModel
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>GPT_CONFIG_124M ={
-</span></span><span style=display:flex><span>    &#34;vocab_size&#34;:50257,
-</span></span><span style=display:flex><span>    &#34;context_length&#34;:1024,
-</span></span><span style=display:flex><span>    &#34;emb_dim&#34;:768,
-</span></span><span style=display:flex><span>    &#34;n_heads&#34;:12,
-</span></span><span style=display:flex><span>    &#34;n_layers&#34;:12,
-</span></span><span style=display:flex><span>    &#34;drop_rate&#34;:0.1,
-</span></span><span style=display:flex><span>    &#34;qkv_bias&#34;:False
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def generate_text_simple(model, idx, max_new_tokens, context_size):
-</span></span><span style=display:flex><span>    for _ in range(max_new_tokens):
-</span></span><span style=display:flex><span>        # 将当前文本截断至大模型支持的长度
-</span></span><span style=display:flex><span>        idx_cond = idx[:, -context_size:]
-</span></span><span style=display:flex><span>        with torch.no_grad():
-</span></span><span style=display:flex><span>            logits = model(idx_cond)
-</span></span><span style=display:flex><span>        # 仅关注最后一个时间步的logits
-</span></span><span style=display:flex><span>        logits = logits[:, -1, :]
-</span></span><span style=display:flex><span>        # 转换为概率分布
-</span></span><span style=display:flex><span>        probs = torch.softmax(logits, dim=-1)
-</span></span><span style=display:flex><span>        # 采样下一个token
-</span></span><span style=display:flex><span>        idx_next = torch.argmax(probs, dim=-1, keepdim=True)
-</span></span><span style=display:flex><span>        # 拼接采样的token
-</span></span><span style=display:flex><span>        idx = torch.cat((idx, idx_next), dim=1)
-</span></span><span style=display:flex><span>    return idx
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def text_to_token_ids(text, tokenizer):
-</span></span><span style=display:flex><span>    encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;})
-</span></span><span style=display:flex><span>    encoded_tensor = torch.tensor(encoded).unsqueeze(0)
-</span></span><span style=display:flex><span>    return encoded_tensor
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def token_ids_to_text(token_ids, tokenizer):
-</span></span><span style=display:flex><span>    flat = token_ids.squeeze(0)
-</span></span><span style=display:flex><span>    return tokenizer.decode(flat.tolist())
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>start_context = &#34;Every effort moves you&#34;
-</span></span><span style=display:flex><span>tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>model = GPTModel(GPT_CONFIG_124M)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>token_ids = generate_text_simple(
-</span></span><span style=display:flex><span>    model=model,
-</span></span><span style=display:flex><span>    idx=text_to_token_ids(start_context, tokenizer),
-</span></span><span style=display:flex><span>    max_new_tokens=10,
-</span></span><span style=display:flex><span>    context_size=GPT_CONFIG_124M[&#34;context_length&#34;]
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>print(token_ids_to_text(token_ids, tokenizer))
-</span></span></code></pre></div><h2 id=交叉熵损失的计算>交叉熵损失的计算</h2><p>模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。</p><p>文本评估是衡量生成词元和目标之间的偏差程度。一般用交叉熵损失。</p><p>整个过程如下：</p><p>Logits → Softmax → 拿到正确位置概率 p[t] → 取负对数 → 平均 → 得到非负损失 → 用梯度下降把损失压向 0（即把正确词元的 softmax 概率往 1 推）。</p><ol><li>logits： 模型最后一层输出向量 z ∈ ℝ^V，V 是词表大小。</li><li>Softmax：概率 p = Softmax(z) ⇒  p[i] = e^{z[i]} / Σ_j e^{z[j]}，这一步把任意实数 logits 变成概率分布，0≤p[i]≤1，Σp[i]=1。</li><li>目标概率（one-hot）
-真实标签用 one-hot 向量 y 表示：y[t]=1，其余为 0，t 是目标词元 ID。</li><li>对数概率我们关心的是“正确位置的概率”，即 p[t]。取 log 后得到 log p[t] ∈ (−∞,0]。</li><li>平均对数概率：一个 batch 里就是L̄ = 1/N Σ log p[t_i]</li><li>负平均对数概率 = 交叉熵损失。</li></ol><h2 id=反向传播>反向传播</h2><p>如何最大化与目标词元对应的softmax概率值呢？大致思路是，更新模型权重，以便模型为我们想要生成的相应词元ID输出更高的值。这个过程叫反向传播。</p><ul><li>对 Loss 求模型参数 θ 的梯度 ∇_θ Loss。</li><li>因为 Loss = −log p[t]，所以∇_θ Loss = −∇_θ log p[t] = −1/p[t] · ∇_θ p[t]。</li><li>用优化器（SGD/Adam）沿−∇_θ Loss 更新 θ，等价于让 p[t] 变大。重复足够多步，p[t] 趋近 1，Loss 趋近 0。</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># 输入</span>
-</span></span><span style=display:flex><span>inputs <span style=color:#ff79c6>=</span> torch<span style=color:#ff79c6>.</span>tensor([[<span style=color:#bd93f9>16833</span>, <span style=color:#bd93f9>3626</span>, <span style=color:#bd93f9>6100</span>],
-</span></span><span style=display:flex><span>                       [<span style=color:#bd93f9>40</span>,    <span style=color:#bd93f9>1107</span>, <span style=color:#bd93f9>588</span>]])
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#ff79c6>with</span>  torch<span style=color:#ff79c6>.</span>no_grad():
-</span></span><span style=display:flex><span>    logits <span style=color:#ff79c6>=</span> model(inputs)
-</span></span><span style=display:flex><span>probas <span style=color:#ff79c6>=</span> torch<span style=color:#ff79c6>.</span>softmax(logits, dim<span style=color:#ff79c6>=-</span><span style=color:#bd93f9>1</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#6272a4># 目标</span>
-</span></span><span style=display:flex><span>targets <span style=color:#ff79c6>=</span> torch<span style=color:#ff79c6>.</span>tensor([[<span style=color:#bd93f9>3626</span>,<span style=color:#bd93f9>6100</span>,<span style=color:#bd93f9>345</span>],[<span style=color:#bd93f9>1107</span>,<span style=color:#bd93f9>588</span>,<span style=color:#bd93f9>11311</span>]])
-</span></span></code></pre></div><p>probas 是形状为 [批次大小, 词元数量, 词汇表大小] 的张量，probas 里的每个元素已经是 softmax 归一化后的概率；接下来只需按真实标签索引出对应概率，再做“取对数 → 求平均 → 取反”即可得到可用于训练的损失值。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4>#按批次和序列位置锁定目标词元</span>
-</span></span><span style=display:flex><span>text_idx <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
-</span></span><span style=display:flex><span>target_probas_1 <span style=color:#ff79c6>=</span> probas[text_idx, [<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>2</span>], targets[text_idx]]
-</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#34;Text 1:&#34;</span>, target_probas_1)
-</span></span></code></pre></div><p>在批次 0 的三个词元位置上，取出模型预测目标词元（targets[0]）处的概率值，得到长度为 3 的概率向量 target_probas_1。[0, 1, 2] 表示在该句子的 前3 个词元位置上同时取值。</p><p>接下来，对这 3 个概率取自然对数并求平均，再取相反数，就得到该批次的平均交叉熵损失：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># 计算交叉熵损失（或负对数似然）</span>
-</span></span><span style=display:flex><span>log_probas <span style=color:#ff79c6>=</span> torch<span style=color:#ff79c6>.</span>log(torch<span style=color:#ff79c6>.</span>cat((target_probas_1, target_probas_2)))
-</span></span><span style=display:flex><span>avg_log_probas <span style=color:#ff79c6>=</span> torch<span style=color:#ff79c6>.</span>mean(log_probas)
-</span></span><span style=display:flex><span>neg_avg_log_probas <span style=color:#ff79c6>=</span> avg_log_probas <span style=color:#ff79c6>*</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>
-</span></span></code></pre></div><h2 id=关于交叉熵损失的理解>关于交叉熵损失的理解</h2><ol><li>目标是通过在训练过程中更新模型的权重，使平均对数概率尽可能接近0。</li><li>通常的做法不是将平均对数概率升至0，而是将负平均对数概率降至0。负平均对数概率就是平均对数概率乘以-1。如何理解负值？</li></ol><h2 id=困惑度>困惑度</h2><p>困惑度指模型不确定应该选取词汇表的哪个词元来作为下一个词元。较低的困惑度表明模型的预测更接近实际分布。</p><h1 id=三训练>三、训练</h1><p>训练大语言模型一共有8个步骤：</p><p><img src="https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=NDhlMjE5ODBjYzc0N2IwZWY4N2VlZWQyMjc3ZjdiZGJfTUt3eWNsbFpUeWg4TzdUU0pBRnRXR3k0UmpOaGpvc0dfVG9rZW46RXYzWWJmbDhkbzVoUDN4Q3l5Z2NLcDdzblBrXzE3NTc4NDYxMjU6MTc1Nzg0OTcyNV9WNA" alt></p><p>（图源《从零构建大模型》图5-11）</p><p>从遍历每个训练轮次开始，处理批次，重置梯度，计算损失和新梯度，更新权重，最后以监控步骤（包括打印损失、生成文本样本等操作）结束。</p><h2 id=语料>语料</h2><p>我用的是阿加莎的小说作为训练语料。</p><p>4.50 from Paddington是 阿加莎·克里斯蒂1957 年出版的侦探小说，属于“马普尔小姐”系列第7部。它的 Characters为378644，Tokens为107433。</p><p>这个语料有10万个词元。</p><p>未经训练，模型在语料上的loss为 Training loss: 11.0156，Validation loss: 11.0129。</p><p>关于训练，我的设置是23个训练集批次，每个批次包含4个样本，每个样本包含1024个词元。</p><h2 id=epoch>epoch</h2><p>1 个 epoch表示：模型已经“看”完整个训练集一次。</p><p>在阿加莎这个语料里就是：</p><ol><li>把 107 433 个 token 按 1024 token 一段、无重叠地切成 ~105 段；</li><li>把这 105 段全部前向+反向传播一遍；</li><li>因为 batch_size=4，所以分成 27 个 step 做完。
-做完这 27 步，就叫 1 个 epoch。</li></ol><h2 id=和深度学习训练不一样的地方>和深度学习训练不一样的地方</h2><p>训练时不用epoch而用max_steps或者max_tokens的概念。</p><ol><li>数据不再是静态文件，而是动态采样
-很多大规模训练用去重、实时过滤、混合多语种，数据管道永远有新样本，根本没有“遍历完一次”这个概念。</li><li>学习率、评估、checkpoint 都按步数调度</li></ol><h2 id=结果>结果</h2><p>运行了2700步之后，结果是：</p><p>为什么全是 � / 重复引号？</p><ul><li>temperature=0（argmax）本身就会放大这类局部最优；早期权重随机时，它最容易卡在“高频但无意义”的符号上。</li></ul><h3 id=改进>改进</h3><p>于是我把“贪婪 argmax”换成了“多项式采样 ”</p><p>之前</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plain data-lang=plain><span style=display:flex><span>for _ in range(max_new):
-</span></span><span style=display:flex><span>    idx_crop = idx[:, -cfg.ctx_len:]
-</span></span><span style=display:flex><span>    logits = model(idx_crop)[:, -1, :]
-</span></span><span style=display:flex><span>    probs  = torch.softmax(logits, dim=-1)
-</span></span><span style=display:flex><span>    nxt    = torch.argmax(probs, dim=-1, keepdim=True)
-</span></span><span style=display:flex><span>    idx    = torch.cat((idx, nxt), dim=1)
-</span></span></code></pre></div><p>现在</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plain data-lang=plain><span style=display:flex><span>
-</span></span><span style=display:flex><span>for _ in range(cfg.gen_max_tokens):
-</span></span><span style=display:flex><span>    idx_crop = idx[:, -cfg.ctx_len:]
-</span></span><span style=display:flex><span>    logits = model(idx_crop)[:, -1, :]
-</span></span><span style=display:flex><span>    probs  = torch.softmax(logits, dim=-1)
-</span></span><span style=display:flex><span>    nxt    = torch.multinomial(probs, num_samples=1)   # 采样避免死循环
-</span></span><span style=display:flex><span>    idx    = torch.cat((idx, nxt), dim=1)
-</span></span></code></pre></div><p>现在的结果如下，比之前好了一些。</p><h3 id=训练trace>训练Trace</h3><p><img src="https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=OTg5NjhiYjE0YmMyZTg0NzU1YjNlYWE5OWEyNmFhYzJfMm9WbzZlUnRRb1lGSTJ3NWcyWHFBTVNxc3pWNTJlV2lfVG9rZW46TGlCa2JKeDdmb2xEWEF4VXZwSWNzM0tLbndiXzE3NTc4NDYxMjU6MTc1Nzg0OTcyNV9WNA" alt></p><ul><li>初始交叉熵 ≈ 11（ln(50257)≈10.8，接近均匀随机）。</li><li>3 k 步后 train 降到 4.8</li><li>曲线不是平滑下降，而是有上下波动</li><li>特别是在后期（1800步以后），下降不够稳定</li><li>这表明优化过程不够平稳</li></ul><h3 id=训练脚本>训练脚本</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plain data-lang=plain><span style=display:flex><span>#!/usr/bin/env python3
-</span></span><span style=display:flex><span>&#34;&#34;&#34;
-</span></span><span style=display:flex><span>极简 GPT-2 124M 训练脚本
-</span></span><span style=display:flex><span>&#34;&#34;&#34;
-</span></span><span style=display:flex><span>import os
-</span></span><span style=display:flex><span>import sys
-</span></span><span style=display:flex><span>import math
-</span></span><span style=display:flex><span>import torch
-</span></span><span style=display:flex><span>import torch.nn as nn
-</span></span><span style=display:flex><span>import tiktoken
-</span></span><span style=display:flex><span>from dataclasses import dataclass
-</span></span><span style=display:flex><span>from pathlib import Path
-</span></span><span style=display:flex><span>import swanlab
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-</span></span><span style=display:flex><span>sys.path.insert(0, project_root)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>from gpt2_module.gpt2 import GPTModel
-</span></span><span style=display:flex><span>from data_process.dataloader import create_dataloader
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 1. 所有超参、路径、训练设置 → 一个类管到底
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>@dataclass
-</span></span><span style=display:flex><span>class Config:
-</span></span><span style=display:flex><span>    # ---- 模型 ----
-</span></span><span style=display:flex><span>    vocab_size: int = 50_257
-</span></span><span style=display:flex><span>    ctx_len: int = 1_024
-</span></span><span style=display:flex><span>    emb_dim: int = 768
-</span></span><span style=display:flex><span>    n_heads: int = 12
-</span></span><span style=display:flex><span>    n_layers: int = 12
-</span></span><span style=display:flex><span>    drop_rate: float = 0.1
-</span></span><span style=display:flex><span>    qkv_bias: bool = False
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    # ---- 数据 ----
-</span></span><span style=display:flex><span>    data_file: str = &#34;/home/data/sophia/resource/4_50 From Paddington - Agatha Christie.txt&#34;
-</span></span><span style=display:flex><span>    train_ratio: float = 0.90
-</span></span><span style=display:flex><span>    tokenizer_name: str = &#34;gpt2&#34;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    # ---- 训练 ----
-</span></span><span style=display:flex><span>    batch_size: int = 8
-</span></span><span style=display:flex><span>    max_steps: int = 2_700       # 用步数控制训练长度（比 epoch 更直观）
-</span></span><span style=display:flex><span>    eval_freq: int = 100           # 每 N 步验证 &amp; 打印样本
-</span></span><span style=display:flex><span>    eval_iter: int = 50            # 验证时只看前 N 个 batch，加快评估
-</span></span><span style=display:flex><span>    lr: float = 4e-3
-</span></span><span style=display:flex><span>    weight_decay: float = 0.10
-</span></span><span style=display:flex><span>    device: str = &#34;cuda&#34; if torch.cuda.is_available() else &#34;cpu&#34;
-</span></span><span style=display:flex><span>    seed: int = 123
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    # ---- 生成 ----
-</span></span><span style=display:flex><span>    start_context: str = &#34;Every effort moves you&#34;
-</span></span><span style=display:flex><span>    gen_max_tokens: int = 50
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 2. 工具函数
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>def set_seed(seed: int):
-</span></span><span style=display:flex><span>    torch.manual_seed(seed)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def load_text(path: str) -&gt; str:
-</span></span><span style=display:flex><span>    with open(path, encoding=&#34;utf-8&#34;) as f:
-</span></span><span style=display:flex><span>        return f.read()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def get_tokenizer(name: str):
-</span></span><span style=display:flex><span>    return tiktoken.get_encoding(name)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def text_to_ids(text: str, tokenizer) -&gt; torch.Tensor:
-</span></span><span style=display:flex><span>    return torch.tensor(tokenizer.encode(text, allowed_special={&#34;&lt;|endoftext|&gt;&#34;})).unsqueeze(0)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>def ids_to_text(ids: torch.Tensor, tokenizer) -&gt; str:
-</span></span><span style=display:flex><span>    return tokenizer.decode(ids.squeeze(0).tolist())
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 3. 数据
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>def build_loaders(cfg: Config, tokenizer):
-</span></span><span style=display:flex><span>    text = load_text(cfg.data_file)
-</span></span><span style=display:flex><span>    split_idx = int(cfg.train_ratio * len(text))
-</span></span><span style=display:flex><span>    train_data, val_data = text[:split_idx], text[split_idx:]
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    # 用 stride=ctx_len 实现无重叠切块
-</span></span><span style=display:flex><span>    train_loader = create_dataloader(
-</span></span><span style=display:flex><span>        train_data, cfg.batch_size, cfg.ctx_len,
-</span></span><span style=display:flex><span>        stride=cfg.ctx_len, drop_last=True, shuffle=True, num_workers=0
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    val_loader = create_dataloader(
-</span></span><span style=display:flex><span>        val_data, cfg.batch_size, cfg.ctx_len,
-</span></span><span style=display:flex><span>        stride=cfg.ctx_len, drop_last=False, shuffle=False, num_workers=0
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>    return train_loader, val_loader
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 4. 模型 + 损失
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>def build_model(cfg: Config) -&gt; GPTModel:
-</span></span><span style=display:flex><span>    model = GPTModel({
-</span></span><span style=display:flex><span>        &#34;vocab_size&#34;: cfg.vocab_size,
-</span></span><span style=display:flex><span>        &#34;context_length&#34;: cfg.ctx_len,
-</span></span><span style=display:flex><span>        &#34;emb_dim&#34;: cfg.emb_dim,
-</span></span><span style=display:flex><span>        &#34;n_heads&#34;: cfg.n_heads,
-</span></span><span style=display:flex><span>        &#34;n_layers&#34;: cfg.n_layers,
-</span></span><span style=display:flex><span>        &#34;drop_rate&#34;: cfg.drop_rate,
-</span></span><span style=display:flex><span>        &#34;qkv_bias&#34;: cfg.qkv_bias
-</span></span><span style=display:flex><span>    })
-</span></span><span style=display:flex><span>    return model.to(cfg.device)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>@torch.no_grad()
-</span></span><span style=display:flex><span>def calc_loss_loader(loader, model, cfg, max_batch=None):
-</span></span><span style=display:flex><span>    model.eval()
-</span></span><span style=display:flex><span>    total, n_batch = 0., 0
-</span></span><span style=display:flex><span>    for i, (x, y) in enumerate(loader):
-</span></span><span style=display:flex><span>        if max_batch and i &gt;= max_batch:
-</span></span><span style=display:flex><span>            break
-</span></span><span style=display:flex><span>        x, y = x.to(cfg.device), y.to(cfg.device)
-</span></span><span style=display:flex><span>        logits = model(x)
-</span></span><span style=display:flex><span>        loss = nn.functional.cross_entropy(
-</span></span><span style=display:flex><span>            logits.flatten(0, 1), y.flatten()
-</span></span><span style=display:flex><span>        )
-</span></span><span style=display:flex><span>        total += loss.item()
-</span></span><span style=display:flex><span>        n_batch += 1
-</span></span><span style=display:flex><span>    return total / n_batch
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 5. 训练闭环
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>def train(cfg: Config, model, train_loader, val_loader, tokenizer):
-</span></span><span style=display:flex><span>    optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
-</span></span><span style=display:flex><span>    model.train()
-</span></span><span style=display:flex><span>    step = 0
-</span></span><span style=display:flex><span>    train_losses, val_losses = [], []
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    while step &lt; cfg.max_steps:
-</span></span><span style=display:flex><span>        for x, y in train_loader:
-</span></span><span style=display:flex><span>            x, y = x.to(cfg.device), y.to(cfg.device)
-</span></span><span style=display:flex><span>            optimizer.zero_grad()
-</span></span><span style=display:flex><span>            logits = model(x)
-</span></span><span style=display:flex><span>            loss = nn.functional.cross_entropy(logits.flatten(0, 1), y.flatten())
-</span></span><span style=display:flex><span>            loss.backward()
-</span></span><span style=display:flex><span>            optimizer.step()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>            step += 1
-</span></span><span style=display:flex><span>            # 每步都记录训练 loss &amp; lr
-</span></span><span style=display:flex><span>            swanlab.log({&#34;train/loss&#34;: loss.item(),
-</span></span><span style=display:flex><span>                         &#34;train/lr&#34;: optimizer.param_groups[0][&#34;lr&#34;]}, step=step)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>            if step % cfg.eval_freq == 0 or step == cfg.max_steps:
-</span></span><span style=display:flex><span>                train_loss = calc_loss_loader(train_loader, model, cfg, max_batch=cfg.eval_iter)
-</span></span><span style=display:flex><span>                val_loss   = calc_loss_loader(val_loader,  model, cfg, max_batch=cfg.eval_iter)
-</span></span><span style=display:flex><span>                # 记录验证指标
-</span></span><span style=display:flex><span>                swanlab.log({&#34;eval/train_loss&#34;: train_loss,
-</span></span><span style=display:flex><span>                             &#34;eval/val_loss&#34;: val_loss}, step=step)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>                model.eval()
-</span></span><span style=display:flex><span>                idx = text_to_ids(cfg.start_context, tokenizer).to(cfg.device)
-</span></span><span style=display:flex><span>                with torch.no_grad():
-</span></span><span style=display:flex><span>                    for _ in range(cfg.gen_max_tokens):
-</span></span><span style=display:flex><span>                        idx_crop = idx[:, -cfg.ctx_len:]
-</span></span><span style=display:flex><span>                        logits = model(idx_crop)[:, -1, :]
-</span></span><span style=display:flex><span>                        probs  = torch.softmax(logits, dim=-1)
-</span></span><span style=display:flex><span>                        nxt    = torch.multinomial(probs, num_samples=1)   # 采样避免死循环
-</span></span><span style=display:flex><span>                        idx    = torch.cat((idx, nxt), dim=1)
-</span></span><span style=display:flex><span>                text = ids_to_text(idx, tokenizer)
-</span></span><span style=display:flex><span>                swanlab.log({&#34;eval/sample&#34;: swanlab.Text(text)}, step=step)
-</span></span><span style=display:flex><span>                model.train()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>            if step &gt;= cfg.max_steps:
-</span></span><span style=display:flex><span>                break
-</span></span><span style=display:flex><span>    return train_losses, val_losses
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 6. 生成
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>@torch.no_grad()
-</span></span><span style=display:flex><span>def generate_sample(cfg: Config, model, tokenizer):
-</span></span><span style=display:flex><span>    model.eval()
-</span></span><span style=display:flex><span>    idx = text_to_ids(cfg.start_context, tokenizer).to(cfg.device)
-</span></span><span style=display:flex><span>    max_new = cfg.gen_max_tokens
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    for _ in range(max_new):
-</span></span><span style=display:flex><span>        idx_crop = idx[:, -cfg.ctx_len:]          # 截断上下文
-</span></span><span style=display:flex><span>        logits = model(idx_crop)[:, -1, :]        # 取最后一个时间步
-</span></span><span style=display:flex><span>        probs  = torch.softmax(logits, dim=-1)
-</span></span><span style=display:flex><span>        nxt    = torch.argmax(probs, dim=-1, keepdim=True)
-</span></span><span style=display:flex><span>        idx    = torch.cat((idx, nxt), dim=1)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    text = ids_to_text(idx, tokenizer)
-</span></span><span style=display:flex><span>    print(&#34;-&gt;&#34; + text.replace(&#34;\n&#34;, &#34; &#34;) + &#34;\n&#34;)
-</span></span><span style=display:flex><span>    model.train()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span># 7. main
-</span></span><span style=display:flex><span># ------------------------------------------------------------------
-</span></span><span style=display:flex><span>def main():
-</span></span><span style=display:flex><span>    cfg = Config()
-</span></span><span style=display:flex><span>    swanlab.init(
-</span></span><span style=display:flex><span>        project=&#34;gpt2-124m-pretrain&#34;,
-</span></span><span style=display:flex><span>        experiment_name=f&#34;lr{cfg.lr}-bs{cfg.batch_size}-steps{cfg.max_steps}&#34;,
-</span></span><span style=display:flex><span>        config=vars(cfg),          # 把所有超参存成表格
-</span></span><span style=display:flex><span>    )
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    set_seed(cfg.seed)
-</span></span><span style=display:flex><span>    tokenizer = get_tokenizer(cfg.tokenizer_name)
-</span></span><span style=display:flex><span>    train_loader, val_loader = build_loaders(cfg, tokenizer)
-</span></span><span style=display:flex><span>    model = build_model(cfg)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    print(&#34;initial loss | train:&#34;, calc_loss_loader(train_loader, model, cfg, cfg.eval_iter),
-</span></span><span style=display:flex><span>          &#34;| val:&#34;, calc_loss_loader(val_loader, model, cfg, cfg.eval_iter))
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    train(cfg, model, train_loader, val_loader, tokenizer)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    # 保存最终权重
-</span></span><span style=display:flex><span>    ckpt_path = os.path.join(PROJECT_ROOT, &#34;gpt2_124M_final.pt&#34;)
-</span></span><span style=display:flex><span>    torch.save(model.state_dict(), ckpt_path)
-</span></span><span style=display:flex><span>    print(&#34;saved -&gt;&#34;, ckpt_path)
-</span></span><span style=display:flex><span>    swanlab.finish()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>if __name__ == &#34;__main__&#34;:
-</span></span><span style=display:flex><span>    PROJECT_ROOT = Path(__file__).resolve().parent
-</span></span><span style=display:flex><span>    main()
-</span></span></code></pre></div><p>运行</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plain data-lang=plain><span style=display:flex><span>CUDA_VISIBLE_DEVICES=0,1,2,4 python -u /home/data/sophia/pretraining/train.py | tee run.log
-</span></span></code></pre></div></article><div class="px-2 mb-2"><script src=https://utteranc.es/client.js repo=HuizhiXu/huizhixu.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script></div><div class="bg-blue-100 dark:bg-gray-900"><div class="container px-4 py-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center"><div><div class="text-2xl font-bold mb-2">Sein heißt werden, leben heißt lernen.</div><p class=opacity-60>Der einfache Weg is immer verkehrt.</p></div><ul class="flex justify-center gap-x-3 flex-wrap gap-y-2"><li><a href=https://twitter.com/ target=_blank rel=noopener aria-label=Twitter class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li><li><a href=https://github.com/ target=_blank rel=noopener aria-label=GitHub class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ul></div></div></main><footer class="container p-6 mx-auto flex justify-between items-center"><span class="text-sm font-light">Copyright © 2012 - Huizhi Xu · All rights reserved
-</span><span onclick='window.scrollTo({top:0,behavior:"smooth"})' class="p-1 cursor-pointer"><svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12"/></svg></span></footer><div class="search-ui absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-800 hidden"><div class="container max-w-3xl mx-auto p-12"><div class=relative><div class="my-4 text-center text-2xl font-bold">Search</div><span class="p-2 absolute right-0 top-0 cursor-pointer close-search"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><input type=search class="py-2 px-3 w-full dark:text-black border dark:border-transparent" placeholder="Enter search query"><div class="search-results text-lg font-medium my-4 hidden">Results</div><ul class="search-list my-2"></ul><div class="no-results text-center my-8 hidden"><div class="text-xl font-semibold mb-2">No results found</div><p class="font-light text-sm">Try adjusting your search query</p></div></div></div><script src=https://huizhixu.github.io/js/scripts.min.js></script><script>const languageMenuButton=document.querySelector(".language-switcher"),languageDropdown=document.querySelector(".language-dropdown");languageMenuButton.addEventListener("click",e=>{e.preventDefault(),languageDropdown.classList.contains("hidden")?(languageDropdown.classList.remove("hidden"),languageDropdown.classList.add("flex")):(languageDropdown.classList.add("hidden"),languageDropdown.classList.remove("flex"))})</script><script>const darkmode=document.querySelector(".toggle-dark-mode");function toggleDarkMode(){document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("darkmode","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("darkmode","dark"))}darkmode&&darkmode.addEventListener("click",toggleDarkMode);const darkStorage=localStorage.getItem("darkmode"),isBrowserDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;!darkStorage&&isBrowserDark&&document.documentElement.classList.add("dark"),darkStorage&&darkStorage==="dark"&&toggleDarkMode()</script><script>const mobileMenuButton=document.querySelector(".mobile-menu-button"),mobileMenu=document.querySelector(".mobile-menu");function toggleMenu(){mobileMenu.classList.toggle("hidden"),mobileMenu.classList.toggle("flex")}mobileMenu&&mobileMenuButton&&mobileMenuButton.addEventListener("click",toggleMenu)</script></body></html>
+from gpt2_module.gpt2 import GPTModel GPT_CONFIG_124M ={ &#34;vocab_size&#34;:50257, &#34;context_length&#34;:1024, &#34;emb_dim&#34;:768, &#34;n_heads&#34;:12, &#34;n_layers&#34;:12, &#34;drop_rate&#34;:0.1, &#34;qkv_bias&#34;:False } def generate_text_simple(model, idx, max_new_tokens, context_size): for _ in range(max_new_tokens): # 将当前文本截断至大模型支持的长度 idx_cond = idx[:, -context_size:] with torch.no_grad(): logits = model(idx_cond) # 仅关注最后一个时间步的logits logits = logits[:, -1, :] # 转换为概率分布 probs = torch.softmax(logits, dim=-1) # 采样下一个token idx_next = torch.argmax(probs, dim=-1, keepdim=True) # 拼接采样的token idx = torch.cat((idx, idx_next), dim=1) return idx def text_to_token_ids(text, tokenizer): encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;}) encoded_tensor = torch.tensor(encoded).unsqueeze(0) return encoded_tensor def token_ids_to_text(token_ids, tokenizer): flat = token_ids.squeeze(0) return tokenizer.decode(flat.tolist()) start_context = &#34;Every effort moves you&#34; tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;) model = GPTModel(GPT_CONFIG_124M) token_ids = generate_text_simple( model=model, idx=text_to_token_ids(start_context, tokenizer), max_new_tokens=10, context_size=GPT_CONFIG_124M[&#34;context_length&#34;] ) print(token_ids_to_text(token_ids, tokenizer)) 交叉熵损失的计算 模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。">
+  <meta itemprop="datePublished" content="2025-09-14T13:54:05+00:00">
+  <meta itemprop="dateModified" content="2025-09-14T13:54:05+00:00">
+  <meta itemprop="wordCount" content="1119">
+  <meta itemprop="keywords" content="Tech">
+
+  
+  <meta name="lang" content="chs" />
+  
+
+  
+</head>
+<body class="dark:bg-gray-800 dark:text-white relative flex flex-col min-h-screen"><header class="container flex justify-between md:justify-between gap-4 flex-wrap p-6 mx-auto relative">
+  <a href="https://huizhixu.github.io/chs/" class="capitalize font-extrabold text-2xl">
+    
+    <img src="../../../blist-logo.png" alt="徐慧志的个人博客" class="h-8 max-w-full" />
+    
+  </a>
+  <button class="mobile-menu-button md:hidden">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+    </svg>
+  </button>
+  <ul class="mobile-menu absolute z-10 px-6 pb-6 md:p-0 top-full left-0 w-full md:w-auto md:relative hidden md:flex flex-col md:flex-row items-end md:items-center gap-4 lg:gap-6 bg-white dark:bg-gray-800">
+
+    
+    <li><a href="../../../chs/know_how/">技术</a></li>
+    
+    <li><a href="../../../chs/life/">生活见闻</a></li>
+    
+    <li><a href="../../../chs/page/about/">关于</a></li>
+    
+    <li><a href="../../../chs/link/">宝藏集结</a></li>
+    
+    <li><a href="../../../chs/tags/">分类</a></li>
+    
+
+    
+    
+    <li class="relative cursor-pointer">
+      <span class="language-switcher flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="12" cy="12" r="9" />
+          <line x1="3.6" y1="9" x2="20.4" y2="9" />
+          <line x1="3.6" y1="15" x2="20.4" y2="15" />
+          <path d="M11.5 3a17 17 0 0 0 0 18" />
+          <path d="M12.5 3a17 17 0 0 1 0 18" />
+        </svg>
+        <a>语言</a>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+          viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M18 15l-6 -6l-6 6h12" transform="rotate(180 12 12)" />
+        </svg>
+      </span>
+      <div
+        class="language-dropdown absolute top-full mt-2 left-0 flex-col gap-2 bg-gray-100 dark:bg-gray-900 dark:text-white z-10 hidden">
+        
+        
+        
+        
+        <a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href="../../../en/" lang="en">English</a>
+        
+        
+        
+        <a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href="../../../de/" lang="de">Deutsch</a>
+        
+        
+      </div>
+    </li>
+    
+    
+
+    
+    <li class="grid place-items-center">
+      <span class="open-search inline-block cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="10" cy="10" r="7" />
+          <line x1="21" y1="21" x2="15" y2="15" />
+        </svg>
+      </span>
+    </li>
+    
+
+    
+    <li class="grid place-items-center">
+      <span class="toggle-dark-mode inline-block cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="5" x2="12" y2="5.01" />
+          <line x1="17" y1="7" x2="17" y2="7.01" />
+          <line x1="19" y1="12" x2="19" y2="12.01" />
+          <line x1="17" y1="17" x2="17" y2="17.01" />
+          <line x1="12" y1="19" x2="12" y2="19.01" />
+          <line x1="7" y1="17" x2="7" y2="17.01" />
+          <line x1="5" y1="12" x2="5" y2="12.01" />
+          <line x1="7" y1="7" x2="7" y2="7.01" />
+        </svg>
+      </span>
+    </li>
+    
+  </ul>
+</header>
+<main class="flex-1">
+  
+  
+
+  
+
+  <article class="prose lg:prose-lg mx-auto my-8 dark:prose-dark px-4">
+
+    <h1 class="text-2xl font-bold mb-2">2025-09-14 从零构建大模型—在无监督数据上进行预训练</h1>
+    
+    <h5 class="text-sm flex items-center flex-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <rect x="4" y="5" width="16" height="16" rx="2" />
+        <line x1="16" y1="3" x2="16" y2="7" />
+        <line x1="8" y1="3" x2="8" y2="7" />
+        <line x1="4" y1="11" x2="20" y2="11" />
+        <rect x="8" y="15" width="2" height="2" />
+      </svg>
+      发布于 
+  
+    2025年09月14日
+  
+
+      
+        &nbsp;&bull;&nbsp;
+      
+      <svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <circle cx="12" cy="12" r="9" />
+        <polyline points="12 7 12 12 15 15" />
+      </svg>
+     6&nbsp;分钟
+     
+      &nbsp;&bull;
+      <svg xmlns="http://www.w3.org/2000/svg" class="mx-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <line x1="3" y1="6" x2="3" y2="19" />
+        <line x1="12" y1="6" x2="12" y2="19" />
+        <line x1="21" y1="6" x2="21" y2="19" />
+      </svg>
+      1119&nbsp;字
+
+    </h5>
+    
+
+    <details id="TableOfContents" class="px-4 mt-4 bg-gray-100 dark:bg-gray-700 rounded toc">
+    <summary class="flex items-center font-bold py-2 px-4 cursor-pointer justify-between select-none text-black dark:text-white">
+      <span>Table of contents</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <polyline points="6 9 12 15 18 9"></polyline>
+     </svg>
+    </summary>
+
+    <ul class="mt-2 pb-4">
+        
+
+        
+        <li>
+        <a href="#%e4%b8%80%e5%89%8d%e6%83%85%e6%8f%90%e8%a6%81">一、前情提要</a>
+        
+
+        
+        <ul>
+            <li>
+        <a href="#%e6%96%87%e6%9c%ac%e7%94%9f%e6%88%90%e5%89%8d%e5%87%a0%e7%ab%a0%e8%ae%b2%e8%bf%87%e7%9a%84">文本生成（前几章讲过的）</a>
+        
+
+        
+        </li><li>
+        <a href="#%e6%9d%83%e9%87%8d%e5%8f%82%e6%95%b0">权重参数</a>
+        
+
+        
+        </li></ul>
+      </li><li>
+        <a href="#%e4%ba%8c%e8%af%84%e4%bc%b0%e6%96%87%e6%9c%ac%e7%94%9f%e6%88%90">二、评估文本生成</a>
+        
+
+        
+        <ul>
+            <li>
+        <a href="#%e5%88%9d%e5%a7%8b%e5%8c%96">初始化</a>
+        
+
+        
+        </li><li>
+        <a href="#%e4%ba%a4%e5%8f%89%e7%86%b5%e6%8d%9f%e5%a4%b1%e7%9a%84%e8%ae%a1%e7%ae%97">交叉熵损失的计算</a>
+        
+
+        
+        </li><li>
+        <a href="#%e5%8f%8d%e5%90%91%e4%bc%a0%e6%92%ad">反向传播</a>
+        
+
+        
+        </li><li>
+        <a href="#%e5%85%b3%e4%ba%8e%e4%ba%a4%e5%8f%89%e7%86%b5%e6%8d%9f%e5%a4%b1%e7%9a%84%e7%90%86%e8%a7%a3">关于交叉熵损失的理解</a>
+        
+
+        
+        </li><li>
+        <a href="#%e5%9b%b0%e6%83%91%e5%ba%a6">困惑度</a>
+        
+
+        
+        </li></ul>
+      </li><li>
+        <a href="#%e4%b8%89%e8%ae%ad%e7%bb%83">三、训练</a>
+        
+
+        
+        <ul>
+            <li>
+        <a href="#%e8%af%ad%e6%96%99">语料</a>
+        
+
+        
+        </li><li>
+        <a href="#epoch">epoch</a>
+        
+
+        
+        </li><li>
+        <a href="#%e5%92%8c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e8%ae%ad%e7%bb%83%e4%b8%8d%e4%b8%80%e6%a0%b7%e7%9a%84%e5%9c%b0%e6%96%b9">和深度学习训练不一样的地方</a>
+        
+
+        
+        </li><li>
+        <a href="#%e7%bb%93%e6%9e%9c">结果</a>
+        
+
+        
+        <ul>
+            <li>
+        <a href="#%e6%94%b9%e8%bf%9b">改进</a>
+        
+
+        
+        </li><li>
+        <a href="#%e8%ae%ad%e7%bb%83trace">训练Trace</a>
+        
+
+        
+        </li><li>
+        <a href="#%e8%ae%ad%e7%bb%83%e8%84%9a%e6%9c%ac">训练脚本</a>
+        </li></ul>
+    </li></ul>
+    </li></ul>
+  </details>
+
+    <p>这一章主要分为以下三个部分：</p>
+<ul>
+<li>评估生成文本的质量</li>
+<li>训练函数</li>
+<li>对大模型进行预训练</li>
+</ul>
+<h1 id="一前情提要">一、前情提要</h1>
+<h2 id="文本生成前几章讲过的">文本生成（前几章讲过的）</h2>
+<p>步骤：</p>
+<ol>
+<li>分词器将输入文本转换成一系列词元ID</li>
+<li>模型接收词元ID，并生成相应的logits</li>
+<li>这些logits被转换回词元ID，分词器会将其解码为人类可读的文本
+logits是表示词汇表中每个词元的概率分布的向量。</li>
+</ol>
+<p>logits 怎么理解：</p>
+<p>logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。</p>
+<p>logits 的用途：</p>
+<p>在推理阶段，取 logits 的 argmax 即可得到每个位置最可能的词元；也可以对 logits 应用温度缩放、Top-K、核采样等技术，再做 multinomial 采样，以平衡多样性与一致性。</p>
+<h2 id="权重参数">权重参数</h2>
+<p>权重参数指的是在训练过程调整的参数。</p>
+<p>PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）</p>
+<h1 id="二评估文本生成">二、评估文本生成</h1>
+<h2 id="初始化">初始化</h2>
+<p>用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plain" data-lang="plain"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>from gpt2_module.gpt2 import GPTModel
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GPT_CONFIG_124M ={
+</span></span><span style="display:flex;"><span>    &#34;vocab_size&#34;:50257,
+</span></span><span style="display:flex;"><span>    &#34;context_length&#34;:1024,
+</span></span><span style="display:flex;"><span>    &#34;emb_dim&#34;:768,
+</span></span><span style="display:flex;"><span>    &#34;n_heads&#34;:12,
+</span></span><span style="display:flex;"><span>    &#34;n_layers&#34;:12,
+</span></span><span style="display:flex;"><span>    &#34;drop_rate&#34;:0.1,
+</span></span><span style="display:flex;"><span>    &#34;qkv_bias&#34;:False
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def generate_text_simple(model, idx, max_new_tokens, context_size):
+</span></span><span style="display:flex;"><span>    for _ in range(max_new_tokens):
+</span></span><span style="display:flex;"><span>        # 将当前文本截断至大模型支持的长度
+</span></span><span style="display:flex;"><span>        idx_cond = idx[:, -context_size:]
+</span></span><span style="display:flex;"><span>        with torch.no_grad():
+</span></span><span style="display:flex;"><span>            logits = model(idx_cond)
+</span></span><span style="display:flex;"><span>        # 仅关注最后一个时间步的logits
+</span></span><span style="display:flex;"><span>        logits = logits[:, -1, :]
+</span></span><span style="display:flex;"><span>        # 转换为概率分布
+</span></span><span style="display:flex;"><span>        probs = torch.softmax(logits, dim=-1)
+</span></span><span style="display:flex;"><span>        # 采样下一个token
+</span></span><span style="display:flex;"><span>        idx_next = torch.argmax(probs, dim=-1, keepdim=True)
+</span></span><span style="display:flex;"><span>        # 拼接采样的token
+</span></span><span style="display:flex;"><span>        idx = torch.cat((idx, idx_next), dim=1)
+</span></span><span style="display:flex;"><span>    return idx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def text_to_token_ids(text, tokenizer):
+</span></span><span style="display:flex;"><span>    encoded = tokenizer.encode(text, allowed_special={&#39;&lt;|endoftext|&gt;&#39;})
+</span></span><span style="display:flex;"><span>    encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+</span></span><span style="display:flex;"><span>    return encoded_tensor
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def token_ids_to_text(token_ids, tokenizer):
+</span></span><span style="display:flex;"><span>    flat = token_ids.squeeze(0)
+</span></span><span style="display:flex;"><span>    return tokenizer.decode(flat.tolist())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>start_context = &#34;Every effort moves you&#34;
+</span></span><span style="display:flex;"><span>tokenizer = tiktoken.get_encoding(&#34;gpt2&#34;)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model = GPTModel(GPT_CONFIG_124M)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>token_ids = generate_text_simple(
+</span></span><span style="display:flex;"><span>    model=model,
+</span></span><span style="display:flex;"><span>    idx=text_to_token_ids(start_context, tokenizer),
+</span></span><span style="display:flex;"><span>    max_new_tokens=10,
+</span></span><span style="display:flex;"><span>    context_size=GPT_CONFIG_124M[&#34;context_length&#34;]
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(token_ids_to_text(token_ids, tokenizer))
+</span></span></code></pre></div><h2 id="交叉熵损失的计算">交叉熵损失的计算</h2>
+<p>模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。</p>
+<p>文本评估是衡量生成词元和目标之间的偏差程度。一般用交叉熵损失。</p>
+<p>整个过程如下：</p>
+<p>Logits → Softmax → 拿到正确位置概率 p[t] → 取负对数 → 平均 → 得到非负损失 → 用梯度下降把损失压向 0（即把正确词元的 softmax 概率往 1 推）。</p>
+<ol>
+<li>logits： 模型最后一层输出向量 z ∈ ℝ^V，V 是词表大小。</li>
+<li>Softmax：概率 p = Softmax(z) ⇒  p[i] = e^{z[i]} / Σ_j e^{z[j]}，这一步把任意实数 logits 变成概率分布，0≤p[i]≤1，Σp[i]=1。</li>
+<li>目标概率（one-hot）
+真实标签用 one-hot 向量 y 表示：y[t]=1，其余为 0，t 是目标词元 ID。</li>
+<li>对数概率我们关心的是“正确位置的概率”，即 p[t]。取 log 后得到 log p[t] ∈ (−∞,0]。</li>
+<li>平均对数概率：一个 batch 里就是L̄ = 1/N Σ log p[t_i]</li>
+<li>负平均对数概率 = 交叉熵损失。</li>
+</ol>
+<h2 id="反向传播">反向传播</h2>
+<p>如何最大化与目标词元对应的softmax概率值呢？大致思路是，更新模型权重，以便模型为我们想要生成的相应词元ID输出更高的值。这个过程叫反向传播。</p>
+<ul>
+<li>对 Loss 求模型参数 θ 的梯度 ∇_θ Loss。</li>
+<li>因为 Loss = −log p[t]，所以∇_θ Loss = −∇_θ log p[t] = −1/p[t] · ∇_θ p[t]。</li>
+<li>用优化器（SGD/Adam）沿−∇_θ Loss 更新 θ，等价于让 p[t] 变大。重复足够多步，p[t] 趋近 1，Loss 趋近 0。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#6272a4"># 输入</span>
+</span></span><span style="display:flex;"><span>inputs <span style="color:#ff79c6">=</span> torch<span style="color:#ff79c6">.</span>tensor([[<span style="color:#bd93f9">16833</span>, <span style="color:#bd93f9">3626</span>, <span style="color:#bd93f9">6100</span>],
+</span></span><span style="display:flex;"><span>                       [<span style="color:#bd93f9">40</span>,    <span style="color:#bd93f9">1107</span>, <span style="color:#bd93f9">588</span>]])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">with</span>  torch<span style="color:#ff79c6">.</span>no_grad():
+</span></span><span style="display:flex;"><span>    logits <span style="color:#ff79c6">=</span> model(inputs)
+</span></span><span style="display:flex;"><span>probas <span style="color:#ff79c6">=</span> torch<span style="color:#ff79c6">.</span>softmax(logits, dim<span style="color:#ff79c6">=-</span><span style="color:#bd93f9">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#6272a4"># 目标</span>
+</span></span><span style="display:flex;"><span>targets <span style="color:#ff79c6">=</span> torch<span style="color:#ff79c6">.</span>tensor([[<span style="color:#bd93f9">3626</span>,<span style="color:#bd93f9">6100</span>,<span style="color:#bd93f9">345</span>],[<span style="color:#bd93f9">1107</span>,<span style="color:#bd93f9">588</span>,<span style="color:#bd93f9">11311</span>]])
+</span></span></code></pre></div><p>probas 是形状为 [批次大小, 词元数量, 词汇表大小] 的张量，probas 里的每个元素已经是 softmax 归一化后的概率；接下来只需按真实标签索引出对应概率，再做“取对数 → 求平均 → 取反”即可得到可用于训练的损失值。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#6272a4">#按批次和序列位置锁定目标词元</span>
+</span></span><span style="display:flex;"><span>text_idx <span style="color:#ff79c6">=</span> <span style="color:#bd93f9">0</span>
+</span></span><span style="display:flex;"><span>target_probas_1 <span style="color:#ff79c6">=</span> probas[text_idx, [<span style="color:#bd93f9">0</span>, <span style="color:#bd93f9">1</span>, <span style="color:#bd93f9">2</span>], targets[text_idx]]
+</span></span><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">print</span>(<span style="color:#f1fa8c">&#34;Text 1:&#34;</span>, target_probas_1)
+</span></span></code></pre></div><p>在批次 0 的三个词元位置上，取出模型预测目标词元（targets[0]）处的概率值，得到长度为 3 的概率向量 target_probas_1。[0, 1, 2] 表示在该句子的 前3 个词元位置上同时取值。</p>
+<p>接下来，对这 3 个概率取自然对数并求平均，再取相反数，就得到该批次的平均交叉熵损失：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#6272a4"># 计算交叉熵损失（或负对数似然）</span>
+</span></span><span style="display:flex;"><span>log_probas <span style="color:#ff79c6">=</span> torch<span style="color:#ff79c6">.</span>log(torch<span style="color:#ff79c6">.</span>cat((target_probas_1, target_probas_2)))
+</span></span><span style="display:flex;"><span>avg_log_probas <span style="color:#ff79c6">=</span> torch<span style="color:#ff79c6">.</span>mean(log_probas)
+</span></span><span style="display:flex;"><span>neg_avg_log_probas <span style="color:#ff79c6">=</span> avg_log_probas <span style="color:#ff79c6">*</span> <span style="color:#ff79c6">-</span><span style="color:#bd93f9">1</span>
+</span></span></code></pre></div><h2 id="关于交叉熵损失的理解">关于交叉熵损失的理解</h2>
+<ol>
+<li>目标是通过在训练过程中更新模型的权重，使平均对数概率尽可能接近0。</li>
+<li>通常的做法不是将平均对数概率升至0，而是将负平均对数概率降至0。负平均对数概率就是平均对数概率乘以-1。如何理解负值？</li>
+</ol>
+<h2 id="困惑度">困惑度</h2>
+<p>困惑度指模型不确定应该选取词汇表的哪个词元来作为下一个词元。较低的困惑度表明模型的预测更接近实际分布。</p>
+<h1 id="三训练">三、训练</h1>
+<p>训练大语言模型一共有8个步骤：</p>
+<p><img src="https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=NDhlMjE5ODBjYzc0N2IwZWY4N2VlZWQyMjc3ZjdiZGJfTUt3eWNsbFpUeWg4TzdUU0pBRnRXR3k0UmpOaGpvc0dfVG9rZW46RXYzWWJmbDhkbzVoUDN4Q3l5Z2NLcDdzblBrXzE3NTc4NDYxMjU6MTc1Nzg0OTcyNV9WNA"></p>
+<p>（图源《从零构建大模型》图5-11）</p>
+<p>从遍历每个训练轮次开始，处理批次，重置梯度，计算损失和新梯度，更新权重，最后以监控步骤（包括打印损失、生成文本样本等操作）结束。</p>
+<h2 id="语料">语料</h2>
+<p>我用的是阿加莎的小说作为训练语料。</p>
+<p>4.50 from Paddington是 阿加莎·克里斯蒂1957 年出版的侦探小说，属于“马普尔小姐”系列第7部。它的 Characters为378644，Tokens为107433。</p>
+<p>这个语料有10万个词元。</p>
+<p>未经训练，模型在语料上的loss为 Training loss: 11.0156，Validation loss: 11.0129。</p>
+<p>关于训练，我的设置是23个训练集批次，每个批次包含4个样本，每个样本包含1024个词元。</p>
+<h2 id="epoch">epoch</h2>
+<p>1 个 epoch表示：模型已经“看”完整个训练集一次。</p>
+<p>在阿加莎这个语料里就是：</p>
+<ol>
+<li>把 107 433 个 token 按 1024 token 一段、无重叠地切成 ~105 段；</li>
+<li>把这 105 段全部前向+反向传播一遍；</li>
+<li>因为 batch_size=4，所以分成 27 个 step 做完。
+做完这 27 步，就叫 1 个 epoch。</li>
+</ol>
+<h2 id="和深度学习训练不一样的地方">和深度学习训练不一样的地方</h2>
+<p>训练时不用epoch而用max_steps或者max_tokens的概念。</p>
+<ol>
+<li>数据不再是静态文件，而是动态采样
+很多大规模训练用去重、实时过滤、混合多语种，数据管道永远有新样本，根本没有“遍历完一次”这个概念。</li>
+<li>学习率、评估、checkpoint 都按步数调度</li>
+</ol>
+<h2 id="结果">结果</h2>
+<p>运行了2700步之后，结果是：</p>
+<p>为什么全是 � / 重复引号？</p>
+<ul>
+<li>temperature=0（argmax）本身就会放大这类局部最优；早期权重随机时，它最容易卡在“高频但无意义”的符号上。</li>
+</ul>
+<h3 id="改进">改进</h3>
+<p>于是我把“贪婪 argmax”换成了“多项式采样 ”</p>
+<p>之前</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plain" data-lang="plain"><span style="display:flex;"><span>for _ in range(max_new):
+</span></span><span style="display:flex;"><span>    idx_crop = idx[:, -cfg.ctx_len:]
+</span></span><span style="display:flex;"><span>    logits = model(idx_crop)[:, -1, :]
+</span></span><span style="display:flex;"><span>    probs  = torch.softmax(logits, dim=-1)
+</span></span><span style="display:flex;"><span>    nxt    = torch.argmax(probs, dim=-1, keepdim=True)
+</span></span><span style="display:flex;"><span>    idx    = torch.cat((idx, nxt), dim=1)
+</span></span></code></pre></div><p>现在</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plain" data-lang="plain"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>for _ in range(cfg.gen_max_tokens):
+</span></span><span style="display:flex;"><span>    idx_crop = idx[:, -cfg.ctx_len:]
+</span></span><span style="display:flex;"><span>    logits = model(idx_crop)[:, -1, :]
+</span></span><span style="display:flex;"><span>    probs  = torch.softmax(logits, dim=-1)
+</span></span><span style="display:flex;"><span>    nxt    = torch.multinomial(probs, num_samples=1)   # 采样避免死循环
+</span></span><span style="display:flex;"><span>    idx    = torch.cat((idx, nxt), dim=1)
+</span></span></code></pre></div><p>现在的结果如下，比之前好了一些。</p>
+<h3 id="训练trace">训练Trace</h3>
+<p><img src="https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=OTg5NjhiYjE0YmMyZTg0NzU1YjNlYWE5OWEyNmFhYzJfMm9WbzZlUnRRb1lGSTJ3NWcyWHFBTVNxc3pWNTJlV2lfVG9rZW46TGlCa2JKeDdmb2xEWEF4VXZwSWNzM0tLbndiXzE3NTc4NDYxMjU6MTc1Nzg0OTcyNV9WNA"></p>
+<ul>
+<li>初始交叉熵 ≈ 11（ln(50257)≈10.8，接近均匀随机）。</li>
+<li>3 k 步后 train 降到 4.8</li>
+<li>曲线不是平滑下降，而是有上下波动</li>
+<li>特别是在后期（1800步以后），下降不够稳定</li>
+<li>这表明优化过程不够平稳</li>
+</ul>
+<h3 id="训练脚本">训练脚本</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plain" data-lang="plain"><span style="display:flex;"><span>#!/usr/bin/env python3
+</span></span><span style="display:flex;"><span>&#34;&#34;&#34;
+</span></span><span style="display:flex;"><span>极简 GPT-2 124M 训练脚本
+</span></span><span style="display:flex;"><span>&#34;&#34;&#34;
+</span></span><span style="display:flex;"><span>import os
+</span></span><span style="display:flex;"><span>import sys
+</span></span><span style="display:flex;"><span>import math
+</span></span><span style="display:flex;"><span>import torch
+</span></span><span style="display:flex;"><span>import torch.nn as nn
+</span></span><span style="display:flex;"><span>import tiktoken
+</span></span><span style="display:flex;"><span>from dataclasses import dataclass
+</span></span><span style="display:flex;"><span>from pathlib import Path
+</span></span><span style="display:flex;"><span>import swanlab
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+</span></span><span style="display:flex;"><span>sys.path.insert(0, project_root)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>from gpt2_module.gpt2 import GPTModel
+</span></span><span style="display:flex;"><span>from data_process.dataloader import create_dataloader
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 1. 所有超参、路径、训练设置 → 一个类管到底
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>@dataclass
+</span></span><span style="display:flex;"><span>class Config:
+</span></span><span style="display:flex;"><span>    # ---- 模型 ----
+</span></span><span style="display:flex;"><span>    vocab_size: int = 50_257
+</span></span><span style="display:flex;"><span>    ctx_len: int = 1_024
+</span></span><span style="display:flex;"><span>    emb_dim: int = 768
+</span></span><span style="display:flex;"><span>    n_heads: int = 12
+</span></span><span style="display:flex;"><span>    n_layers: int = 12
+</span></span><span style="display:flex;"><span>    drop_rate: float = 0.1
+</span></span><span style="display:flex;"><span>    qkv_bias: bool = False
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    # ---- 数据 ----
+</span></span><span style="display:flex;"><span>    data_file: str = &#34;/home/data/sophia/resource/4_50 From Paddington - Agatha Christie.txt&#34;
+</span></span><span style="display:flex;"><span>    train_ratio: float = 0.90
+</span></span><span style="display:flex;"><span>    tokenizer_name: str = &#34;gpt2&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    # ---- 训练 ----
+</span></span><span style="display:flex;"><span>    batch_size: int = 8
+</span></span><span style="display:flex;"><span>    max_steps: int = 2_700       # 用步数控制训练长度（比 epoch 更直观）
+</span></span><span style="display:flex;"><span>    eval_freq: int = 100           # 每 N 步验证 &amp; 打印样本
+</span></span><span style="display:flex;"><span>    eval_iter: int = 50            # 验证时只看前 N 个 batch，加快评估
+</span></span><span style="display:flex;"><span>    lr: float = 4e-3
+</span></span><span style="display:flex;"><span>    weight_decay: float = 0.10
+</span></span><span style="display:flex;"><span>    device: str = &#34;cuda&#34; if torch.cuda.is_available() else &#34;cpu&#34;
+</span></span><span style="display:flex;"><span>    seed: int = 123
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    # ---- 生成 ----
+</span></span><span style="display:flex;"><span>    start_context: str = &#34;Every effort moves you&#34;
+</span></span><span style="display:flex;"><span>    gen_max_tokens: int = 50
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 2. 工具函数
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>def set_seed(seed: int):
+</span></span><span style="display:flex;"><span>    torch.manual_seed(seed)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def load_text(path: str) -&gt; str:
+</span></span><span style="display:flex;"><span>    with open(path, encoding=&#34;utf-8&#34;) as f:
+</span></span><span style="display:flex;"><span>        return f.read()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def get_tokenizer(name: str):
+</span></span><span style="display:flex;"><span>    return tiktoken.get_encoding(name)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def text_to_ids(text: str, tokenizer) -&gt; torch.Tensor:
+</span></span><span style="display:flex;"><span>    return torch.tensor(tokenizer.encode(text, allowed_special={&#34;&lt;|endoftext|&gt;&#34;})).unsqueeze(0)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>def ids_to_text(ids: torch.Tensor, tokenizer) -&gt; str:
+</span></span><span style="display:flex;"><span>    return tokenizer.decode(ids.squeeze(0).tolist())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 3. 数据
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>def build_loaders(cfg: Config, tokenizer):
+</span></span><span style="display:flex;"><span>    text = load_text(cfg.data_file)
+</span></span><span style="display:flex;"><span>    split_idx = int(cfg.train_ratio * len(text))
+</span></span><span style="display:flex;"><span>    train_data, val_data = text[:split_idx], text[split_idx:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    # 用 stride=ctx_len 实现无重叠切块
+</span></span><span style="display:flex;"><span>    train_loader = create_dataloader(
+</span></span><span style="display:flex;"><span>        train_data, cfg.batch_size, cfg.ctx_len,
+</span></span><span style="display:flex;"><span>        stride=cfg.ctx_len, drop_last=True, shuffle=True, num_workers=0
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    val_loader = create_dataloader(
+</span></span><span style="display:flex;"><span>        val_data, cfg.batch_size, cfg.ctx_len,
+</span></span><span style="display:flex;"><span>        stride=cfg.ctx_len, drop_last=False, shuffle=False, num_workers=0
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    return train_loader, val_loader
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 4. 模型 + 损失
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>def build_model(cfg: Config) -&gt; GPTModel:
+</span></span><span style="display:flex;"><span>    model = GPTModel({
+</span></span><span style="display:flex;"><span>        &#34;vocab_size&#34;: cfg.vocab_size,
+</span></span><span style="display:flex;"><span>        &#34;context_length&#34;: cfg.ctx_len,
+</span></span><span style="display:flex;"><span>        &#34;emb_dim&#34;: cfg.emb_dim,
+</span></span><span style="display:flex;"><span>        &#34;n_heads&#34;: cfg.n_heads,
+</span></span><span style="display:flex;"><span>        &#34;n_layers&#34;: cfg.n_layers,
+</span></span><span style="display:flex;"><span>        &#34;drop_rate&#34;: cfg.drop_rate,
+</span></span><span style="display:flex;"><span>        &#34;qkv_bias&#34;: cfg.qkv_bias
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    return model.to(cfg.device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>@torch.no_grad()
+</span></span><span style="display:flex;"><span>def calc_loss_loader(loader, model, cfg, max_batch=None):
+</span></span><span style="display:flex;"><span>    model.eval()
+</span></span><span style="display:flex;"><span>    total, n_batch = 0., 0
+</span></span><span style="display:flex;"><span>    for i, (x, y) in enumerate(loader):
+</span></span><span style="display:flex;"><span>        if max_batch and i &gt;= max_batch:
+</span></span><span style="display:flex;"><span>            break
+</span></span><span style="display:flex;"><span>        x, y = x.to(cfg.device), y.to(cfg.device)
+</span></span><span style="display:flex;"><span>        logits = model(x)
+</span></span><span style="display:flex;"><span>        loss = nn.functional.cross_entropy(
+</span></span><span style="display:flex;"><span>            logits.flatten(0, 1), y.flatten()
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        total += loss.item()
+</span></span><span style="display:flex;"><span>        n_batch += 1
+</span></span><span style="display:flex;"><span>    return total / n_batch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 5. 训练闭环
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>def train(cfg: Config, model, train_loader, val_loader, tokenizer):
+</span></span><span style="display:flex;"><span>    optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+</span></span><span style="display:flex;"><span>    model.train()
+</span></span><span style="display:flex;"><span>    step = 0
+</span></span><span style="display:flex;"><span>    train_losses, val_losses = [], []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    while step &lt; cfg.max_steps:
+</span></span><span style="display:flex;"><span>        for x, y in train_loader:
+</span></span><span style="display:flex;"><span>            x, y = x.to(cfg.device), y.to(cfg.device)
+</span></span><span style="display:flex;"><span>            optimizer.zero_grad()
+</span></span><span style="display:flex;"><span>            logits = model(x)
+</span></span><span style="display:flex;"><span>            loss = nn.functional.cross_entropy(logits.flatten(0, 1), y.flatten())
+</span></span><span style="display:flex;"><span>            loss.backward()
+</span></span><span style="display:flex;"><span>            optimizer.step()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            step += 1
+</span></span><span style="display:flex;"><span>            # 每步都记录训练 loss &amp; lr
+</span></span><span style="display:flex;"><span>            swanlab.log({&#34;train/loss&#34;: loss.item(),
+</span></span><span style="display:flex;"><span>                         &#34;train/lr&#34;: optimizer.param_groups[0][&#34;lr&#34;]}, step=step)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            if step % cfg.eval_freq == 0 or step == cfg.max_steps:
+</span></span><span style="display:flex;"><span>                train_loss = calc_loss_loader(train_loader, model, cfg, max_batch=cfg.eval_iter)
+</span></span><span style="display:flex;"><span>                val_loss   = calc_loss_loader(val_loader,  model, cfg, max_batch=cfg.eval_iter)
+</span></span><span style="display:flex;"><span>                # 记录验证指标
+</span></span><span style="display:flex;"><span>                swanlab.log({&#34;eval/train_loss&#34;: train_loss,
+</span></span><span style="display:flex;"><span>                             &#34;eval/val_loss&#34;: val_loss}, step=step)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                model.eval()
+</span></span><span style="display:flex;"><span>                idx = text_to_ids(cfg.start_context, tokenizer).to(cfg.device)
+</span></span><span style="display:flex;"><span>                with torch.no_grad():
+</span></span><span style="display:flex;"><span>                    for _ in range(cfg.gen_max_tokens):
+</span></span><span style="display:flex;"><span>                        idx_crop = idx[:, -cfg.ctx_len:]
+</span></span><span style="display:flex;"><span>                        logits = model(idx_crop)[:, -1, :]
+</span></span><span style="display:flex;"><span>                        probs  = torch.softmax(logits, dim=-1)
+</span></span><span style="display:flex;"><span>                        nxt    = torch.multinomial(probs, num_samples=1)   # 采样避免死循环
+</span></span><span style="display:flex;"><span>                        idx    = torch.cat((idx, nxt), dim=1)
+</span></span><span style="display:flex;"><span>                text = ids_to_text(idx, tokenizer)
+</span></span><span style="display:flex;"><span>                swanlab.log({&#34;eval/sample&#34;: swanlab.Text(text)}, step=step)
+</span></span><span style="display:flex;"><span>                model.train()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            if step &gt;= cfg.max_steps:
+</span></span><span style="display:flex;"><span>                break
+</span></span><span style="display:flex;"><span>    return train_losses, val_losses
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 6. 生成
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>@torch.no_grad()
+</span></span><span style="display:flex;"><span>def generate_sample(cfg: Config, model, tokenizer):
+</span></span><span style="display:flex;"><span>    model.eval()
+</span></span><span style="display:flex;"><span>    idx = text_to_ids(cfg.start_context, tokenizer).to(cfg.device)
+</span></span><span style="display:flex;"><span>    max_new = cfg.gen_max_tokens
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    for _ in range(max_new):
+</span></span><span style="display:flex;"><span>        idx_crop = idx[:, -cfg.ctx_len:]          # 截断上下文
+</span></span><span style="display:flex;"><span>        logits = model(idx_crop)[:, -1, :]        # 取最后一个时间步
+</span></span><span style="display:flex;"><span>        probs  = torch.softmax(logits, dim=-1)
+</span></span><span style="display:flex;"><span>        nxt    = torch.argmax(probs, dim=-1, keepdim=True)
+</span></span><span style="display:flex;"><span>        idx    = torch.cat((idx, nxt), dim=1)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    text = ids_to_text(idx, tokenizer)
+</span></span><span style="display:flex;"><span>    print(&#34;-&gt;&#34; + text.replace(&#34;\n&#34;, &#34; &#34;) + &#34;\n&#34;)
+</span></span><span style="display:flex;"><span>    model.train()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span># 7. main
+</span></span><span style="display:flex;"><span># ------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>def main():
+</span></span><span style="display:flex;"><span>    cfg = Config()
+</span></span><span style="display:flex;"><span>    swanlab.init(
+</span></span><span style="display:flex;"><span>        project=&#34;gpt2-124m-pretrain&#34;,
+</span></span><span style="display:flex;"><span>        experiment_name=f&#34;lr{cfg.lr}-bs{cfg.batch_size}-steps{cfg.max_steps}&#34;,
+</span></span><span style="display:flex;"><span>        config=vars(cfg),          # 把所有超参存成表格
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    set_seed(cfg.seed)
+</span></span><span style="display:flex;"><span>    tokenizer = get_tokenizer(cfg.tokenizer_name)
+</span></span><span style="display:flex;"><span>    train_loader, val_loader = build_loaders(cfg, tokenizer)
+</span></span><span style="display:flex;"><span>    model = build_model(cfg)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(&#34;initial loss | train:&#34;, calc_loss_loader(train_loader, model, cfg, cfg.eval_iter),
+</span></span><span style="display:flex;"><span>          &#34;| val:&#34;, calc_loss_loader(val_loader, model, cfg, cfg.eval_iter))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    train(cfg, model, train_loader, val_loader, tokenizer)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    # 保存最终权重
+</span></span><span style="display:flex;"><span>    ckpt_path = os.path.join(PROJECT_ROOT, &#34;gpt2_124M_final.pt&#34;)
+</span></span><span style="display:flex;"><span>    torch.save(model.state_dict(), ckpt_path)
+</span></span><span style="display:flex;"><span>    print(&#34;saved -&gt;&#34;, ckpt_path)
+</span></span><span style="display:flex;"><span>    swanlab.finish()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>if __name__ == &#34;__main__&#34;:
+</span></span><span style="display:flex;"><span>    PROJECT_ROOT = Path(__file__).resolve().parent
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p>运行</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-plain" data-lang="plain"><span style="display:flex;"><span>CUDA_VISIBLE_DEVICES=0,1,2,4 python -u /home/data/sophia/pretraining/train.py | tee run.log
+</span></span></code></pre></div>
+  </article>
+<div class="px-2 mb-2">
+  
+  <script src="https://utteranc.es/client.js"
+    repo="HuizhiXu/huizhixu.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
+  </script>
+  
+</div>
+<div class="bg-blue-100 dark:bg-gray-900">
+  <div class="container px-4 py-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+    <div>
+      <div class="text-2xl font-bold mb-2">Sein heißt werden, leben heißt lernen.</div>
+      <p class="opacity-60">Der einfache Weg is immer verkehrt.</p>
+    </div>
+
+    <ul class="flex justify-center gap-x-3 flex-wrap gap-y-2">
+      
+
+      
+      <li>
+        <a
+          href="https://twitter.com/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Twitter"
+          class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"
+            />
+          </svg>
+        </a>
+      </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+      <li>
+        <a
+          href="https://github.com/"
+          target="_blank"
+          rel="noopener"
+          aria-label="GitHub"
+          class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
+            />
+          </svg>
+        </a>
+      </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </ul>
+  </div>
+</div>
+
+    </main><footer class="container p-6 mx-auto flex justify-between items-center">
+  <span class="text-sm font-light">
+    
+    Copyright © 2012 - Huizhi Xu · All rights reserved
+    
+  </span>
+  <span onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="p-1 cursor-pointer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5"
+      stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M18 15l-6 -6l-6 6h12" />
+    </svg>
+  </span>
+</footer>
+
+<div class="search-ui absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-800 hidden">
+  <div class="container max-w-3xl mx-auto p-12">
+    <div class="relative">
+      <div class="my-4 text-center text-2xl font-bold">Search</div>
+
+      <span class="p-2 absolute right-0 top-0 cursor-pointer close-search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </span>
+    </div>
+
+    <input type="search" class="py-2 px-3 w-full dark:text-black border dark:border-transparent"
+      placeholder="Enter search query" />
+
+    <div class="search-results text-lg font-medium my-4 hidden">Results</div>
+    <ul class="search-list my-2">
+
+    </ul>
+
+    <div class="no-results text-center my-8 hidden">
+      <div class="text-xl font-semibold mb-2">No results found</div>
+      <p class="font-light text-sm">Try adjusting your search query</p>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script src="https://huizhixu.github.io/js/scripts.min.js"></script>
+
+
+
+
+<script>
+  const languageMenuButton = document.querySelector('.language-switcher');
+  const languageDropdown = document.querySelector('.language-dropdown');
+  languageMenuButton.addEventListener('click', (evt) => {
+    evt.preventDefault()
+    if (languageDropdown.classList.contains('hidden')) {
+      languageDropdown.classList.remove('hidden')
+      languageDropdown.classList.add('flex')
+    } else {
+      languageDropdown.classList.add('hidden');
+      languageDropdown.classList.remove('flex');
+    }
+  })
+</script>
+
+
+
+<script>
+  
+  const darkmode = document.querySelector('.toggle-dark-mode');
+  function toggleDarkMode() {
+    if (document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('darkmode', 'light')
+    } else {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('darkmode', 'dark')
+    }
+  }
+  if (darkmode) {
+    darkmode.addEventListener('click', toggleDarkMode);
+  }
+
+  const darkStorage = localStorage.getItem('darkmode');
+  const isBrowserDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (!darkStorage && isBrowserDark) {
+    document.documentElement.classList.add('dark');
+  }
+
+  if (darkStorage && darkStorage === 'dark') {
+    toggleDarkMode();
+  }
+</script>
+
+
+<script>
+  const mobileMenuButton = document.querySelector('.mobile-menu-button')
+  const mobileMenu = document.querySelector('.mobile-menu')
+  function toggleMenu() {
+    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.toggle('flex');
+  }
+  if(mobileMenu && mobileMenuButton){
+    mobileMenuButton.addEventListener('click', toggleMenu)
+  }
+</script>
+</body>
+</html>
