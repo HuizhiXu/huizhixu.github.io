@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Llm on 徐慧志的个人博客</title><link>https://huizhixu.github.io/tags/llm/</link><description>Recent content in Llm on 徐慧志的个人博客</description><generator>Hugo</generator><language>chs</language><lastBuildDate>Wed, 05 Nov 2025 01:37:39 +0000</lastBuildDate><atom:link href="https://huizhixu.github.io/tags/llm/index.xml" rel="self" type="application/rss+xml"/><item><title>2025-11-05 从零构建大模型—针对分类的微调</title><link>https://huizhixu.github.io/know_how/20251105%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%92%88%E5%AF%B9%E5%88%86%E7%B1%BB%E7%9A%84%E5%BE%AE%E8%B0%83/</link><pubDate>Wed, 05 Nov 2025 01:37:39 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20251105%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%92%88%E5%AF%B9%E5%88%86%E7%B1%BB%E7%9A%84%E5%BE%AE%E8%B0%83/</guid><description>&lt;p&gt;这本书最后两章的例子9月底就运行完了，但是微信读书会员到期了。最近又开了会员复习了一遍，记录下来。&lt;/p&gt;
+&lt;p&gt;微调通常可分为以下三个阶段：&lt;/p&gt;
+&lt;p&gt;第一阶段：数据准备&lt;/p&gt;
+&lt;p&gt;包括下载数据集、进行数据预处理以及构建数据加载器。&lt;/p&gt;
+&lt;p&gt;第二阶段：模型准备&lt;/p&gt;
+&lt;p&gt;涵盖模型初始化、加载预训练权重、调整模型结构，并实现评估工具。&lt;/p&gt;
+&lt;p&gt;第三阶段：模型微调与部署&lt;/p&gt;
+&lt;p&gt;包括执行模型微调、评估微调效果，以及在新数据上进行推理。&lt;/p&gt;
+&lt;p&gt;在语言模型微调中，主要分为分类微调和指令微调两种类型。分类微调相对简单，例如在垃圾消息检测任务中，模型只需输出&amp;quot;垃圾消息&amp;quot;或&amp;quot;非垃圾消息&amp;quot;两类结果，适用于对分类精度要求较高的场景。本章重点在于通过调整模型结构来实现微调，因此可以重点关注模型结构的修改方法。&lt;/p&gt;
+&lt;h2 id="第一阶段准备数据"&gt;第一阶段：准备数据&lt;/h2&gt;
+&lt;h3 id="1-下载数据"&gt;1. 下载数据&lt;/h3&gt;
+&lt;p&gt;网上有公开的垃圾邮件和非垃圾邮件数据集可供下载。&lt;/p&gt;
+&lt;h3 id="2-数据集预处理"&gt;2. 数据集预处理&lt;/h3&gt;
+&lt;p&gt;预处理时主要需要注意设置max_length进行截断和填充。另外，在分类任务中需要特别关注各类别数据的均衡性。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; uu &lt;span style="color:#f92672"&gt;import&lt;/span&gt; encode
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; torch
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;from&lt;/span&gt; torch.utils.data &lt;span style="color:#f92672"&gt;import&lt;/span&gt; Dataset
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; tiktoken
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#f92672"&gt;import&lt;/span&gt; pandas &lt;span style="color:#66d9ef"&gt;as&lt;/span&gt; pd
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;SpamDataset&lt;/span&gt;(Dataset):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__init__&lt;/span&gt;(self, csv_file, tokenizer, max_len&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;200&lt;/span&gt;,pad_token_id&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;50256&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;csv_file &lt;span style="color:#f92672"&gt;=&lt;/span&gt; csv_file
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;data &lt;span style="color:#f92672"&gt;=&lt;/span&gt; pd&lt;span style="color:#f92672"&gt;.&lt;/span&gt;read_csv(csv_file, sep&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#e6db74"&gt;&amp;#39;&lt;/span&gt;&lt;span style="color:#ae81ff"&gt;\\&lt;/span&gt;&lt;span style="color:#e6db74"&gt;t&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;encoded_texts &lt;span style="color:#f92672"&gt;=&lt;/span&gt;[tokenizer&lt;span style="color:#f92672"&gt;.&lt;/span&gt;encode(text) &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; text &lt;span style="color:#f92672"&gt;in&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;data[&lt;span style="color:#e6db74"&gt;&amp;#39;text&amp;#39;&lt;/span&gt;]]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;max_len &lt;span style="color:#f92672"&gt;=&lt;/span&gt; max_len
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;max_len:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; processed_texts &lt;span style="color:#f92672"&gt;=&lt;/span&gt; []
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;for&lt;/span&gt; encoded &lt;span style="color:#f92672"&gt;in&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;encoded_texts:
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;# 截断到最大长度&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; truncated &lt;span style="color:#f92672"&gt;=&lt;/span&gt; encoded[:self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;max_len]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;# 填充到最大长度&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; padded &lt;span style="color:#f92672"&gt;=&lt;/span&gt; truncated &lt;span style="color:#f92672"&gt;+&lt;/span&gt; [pad_token_id] &lt;span style="color:#f92672"&gt;*&lt;/span&gt; (self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;max_len &lt;span style="color:#f92672"&gt;-&lt;/span&gt; len(truncated))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; processed_texts&lt;span style="color:#f92672"&gt;.&lt;/span&gt;append(padded)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;encoded_texts &lt;span style="color:#f92672"&gt;=&lt;/span&gt; processed_texts
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__getitem__&lt;/span&gt;(self, index):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; encoded &lt;span style="color:#f92672"&gt;=&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;encoded_texts[index]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; label &lt;span style="color:#f92672"&gt;=&lt;/span&gt; self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;data&lt;span style="color:#f92672"&gt;.&lt;/span&gt;iloc[index][&lt;span style="color:#e6db74"&gt;&amp;#39;label&amp;#39;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; (torch&lt;span style="color:#f92672"&gt;.&lt;/span&gt;tensor(encoded, dtype&lt;span style="color:#f92672"&gt;=&lt;/span&gt;torch&lt;span style="color:#f92672"&gt;.&lt;/span&gt;long), torch&lt;span style="color:#f92672"&gt;.&lt;/span&gt;tensor(label, dtype&lt;span style="color:#f92672"&gt;=&lt;/span&gt;torch&lt;span style="color:#f92672"&gt;.&lt;/span&gt;long))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;def&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;__len__&lt;/span&gt;(self):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; len(self&lt;span style="color:#f92672"&gt;.&lt;/span&gt;data)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="3-创建数据加载器"&gt;3. 创建数据加载器&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;train_loader &lt;span style="color:#f92672"&gt;=&lt;/span&gt; DataLoader(train_dataset, batch_size&lt;span style="color:#f92672"&gt;=&lt;/span&gt;batch_size, shuffle&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;True&lt;/span&gt;, num_workers&lt;span style="color:#f92672"&gt;=&lt;/span&gt;num_worker)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;val_loader &lt;span style="color:#f92672"&gt;=&lt;/span&gt; DataLoader(val_dataset, batch_size&lt;span style="color:#f92672"&gt;=&lt;/span&gt;batch_size, shuffle&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;False&lt;/span&gt;, num_workers&lt;span style="color:#f92672"&gt;=&lt;/span&gt;num_worker)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;test_loader &lt;span style="color:#f92672"&gt;=&lt;/span&gt; DataLoader(test_dataset, batch_size&lt;span style="color:#f92672"&gt;=&lt;/span&gt;batch_size, shuffle&lt;span style="color:#f92672"&gt;=&lt;/span&gt;&lt;span style="color:#66d9ef"&gt;False&lt;/span&gt;, num_workers&lt;span style="color:#f92672"&gt;=&lt;/span&gt;num_worker)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="第二阶段修改模型"&gt;第二阶段：修改模型&lt;/h2&gt;
+&lt;h3 id="1-模型初始化"&gt;1. 模型初始化&lt;/h3&gt;
+&lt;p&gt;GPTModel是在《徒手组装GPT》章节中构建好的类。&lt;/p&gt;</description></item><item><title>2025-11-01 从零构建大模型—通过微调遵循人类指令</title><link>https://huizhixu.github.io/know_how/20251101-%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%80%9A%E8%BF%87%E5%BE%AE%E8%B0%83%E9%81%B5%E5%BE%AA%E4%BA%BA%E7%B1%BB%E6%8C%87%E4%BB%A4/</link><pubDate>Sat, 01 Nov 2025 01:37:41 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20251101-%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%80%9A%E8%BF%87%E5%BE%AE%E8%B0%83%E9%81%B5%E5%BE%AA%E4%BA%BA%E7%B1%BB%E6%8C%87%E4%BB%A4/</guid><description>&lt;p&gt;终于来到这本书的最后一章啦。&lt;/p&gt;
+&lt;p&gt;这本书的整体脉络非常清晰：从最初的输入处理，逐步深入到自注意力机制、因果自注意力，再到亲手实现一个大模型，接着进行预训练，并最终完成分类微调和指令微调。完成整个学习过程后，确实感到收获颇丰。（个人觉得第三、四章的内容最为关键）&lt;/p&gt;
+&lt;p&gt;当然我也清楚，还有很多细节需要进一步补充，比如训练过程中的各种技巧、多卡并行操作，以及参数高效微调等等。这些都是我接下来会继续学习的内容。&lt;/p&gt;
+&lt;p&gt;接下来是本章的内容：&lt;/p&gt;
+&lt;p&gt;预训练后的大模型能够实现文本补全——给定一个文本片段作为输入，模型能够继续生成后续内容。
+但如果希望模型能够遵循指令、生成合理回复，就需要进行指令微调。&lt;/p&gt;
+&lt;p&gt;这一部分的实现流程和上一章很相似，主要区别在于数据集的格式。依然分为三个阶段来完成。&lt;/p&gt;
+&lt;p&gt;第一阶段：数据准备&lt;/p&gt;
+&lt;p&gt;包括下载数据集、进行数据预处理以及构建数据加载器。&lt;/p&gt;
+&lt;p&gt;第二阶段：模型微调&lt;/p&gt;
+&lt;p&gt;包括加载预训练大语言模型、执行指令微调以及监控模型损失。&lt;/p&gt;
+&lt;p&gt;第三阶段：评估大语言模型&lt;/p&gt;
+&lt;p&gt;包括提取模型回复、进行量化评估以及对生成内容打分。&lt;/p&gt;
+&lt;h2 id="第一阶段数据准备"&gt;第一阶段：数据准备&lt;/h2&gt;
+&lt;h3 id="1-下载数据"&gt;1. 下载数据&lt;/h3&gt;
+&lt;p&gt;可以使用网上已有的数据集：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;url &lt;span style="color:#f92672"&gt;=&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch07/01_main-chapter-code/instruction-data.json&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;指令微调所需的数据是“输入-输出”对。例如：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; {&lt;span style="color:#e6db74"&gt;&amp;#39;instruction&amp;#39;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#39;Identify the correct spelling of the following word.&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;input&amp;#39;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#39;Ocassion&amp;#39;&lt;/span&gt;, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;output&amp;#39;&lt;/span&gt;: &lt;span style="color:#e6db74"&gt;&amp;#34;The correct spelling is &amp;#39;Occasion.&amp;#39;&amp;#34;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;为了适配大模型的输入格式，还需要将数据加工成如下形式。这种“###”分隔的格式，是从概率角度帮助模型识别结构：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Below &lt;span style="color:#f92672"&gt;is&lt;/span&gt; an instruction that describe a task&lt;span style="color:#f92672"&gt;.&lt;/span&gt; Write a response that appropriately
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; complete the request&lt;span style="color:#f92672"&gt;.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;### Instruction:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Identify the correct spelling of the following word&lt;span style="color:#f92672"&gt;.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;### Input:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Ocassion
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#75715e"&gt;### Output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;The correct spelling &lt;span style="color:#f92672"&gt;is&lt;/span&gt; &lt;span style="color:#e6db74"&gt;&amp;#39;Occasion&amp;#39;&lt;/span&gt;&lt;span style="color:#f92672"&gt;.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="2-数据集预处理"&gt;2. 数据集预处理&lt;/h3&gt;
+&lt;p&gt;数据下载后，需要将样本填充至相同长度，并进行批次处理。&lt;/p&gt;</description></item><item><title>2025-09-21 从零构建大模型—文本生成策略</title><link>https://huizhixu.github.io/know_how/20250921%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/</link><pubDate>Sun, 21 Sep 2025 01:37:42 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20250921%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/</guid><description>&lt;p&gt;在解码的时候，生成的词元是从词汇表的所有词元中选择概率分数最大的那一个，也就是argmax最大的词元id，但是这种形式让大模型失去丰富性，因为多次运行大模型生成的文本是相同的。&lt;/p&gt;
+&lt;p&gt;两种技术（温度缩放和Top-k采样）可以用于文本生成的优化。&lt;/p&gt;
+&lt;h2 id="温度缩放"&gt;温度缩放&lt;/h2&gt;
+&lt;p&gt;用一个从概率分布（这里是大语言模型在每个词元生成步骤为每个词汇条目生成的概率分数）中采样的函数来取代argmax。&lt;/p&gt;
+&lt;p&gt;这个概率采样函数Multinomial按照词汇表的概率分数采样下一个词元。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;argmax 永远挑概率最大的那个；&lt;/li&gt;
+&lt;li&gt;multinomial 按概率分布随机抽签——大概率事件只是“中签率高”，并非 100 %。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;torch.manual_seed(123)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;next_token_id = torch.multinomial(probas, num_samples=1).item()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(inverse_vocab[next_token_id])
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;通过一个称为温度缩放的概念，可以进一步控制分布和选择过程。温度缩放指的是将logits除以一个大于0的数。温度大于1会导致词元概率更加均匀分布，而小于1的温度将导致更加自信（更尖锐或更陡峭）的分布。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def softmax_with_temperature(logits, temperature):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; scaled_logits = logits / temperature
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; return torch.softmax(scaled_logits, dim=0)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;应用非常小的温度（如0.1）会导致更集中的分布，使得multinomial函数几乎100%选择最可能的词元，接近于argmax函数的行为。温度增大会导致更均匀的分布，使得其他词元更容易被选中。这可以为生成的文本增加更多变化，但也更容易生成无意义的文本。&lt;/p&gt;
+&lt;h3 id="设置温度"&gt;设置温度&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;vocab = {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;closer&amp;#34;: 0,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;every&amp;#34;: 1,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;effort&amp;#34;: 2,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;forward&amp;#34;: 3,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;inches&amp;#34;: 4,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;moves&amp;#34;: 5,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;pizza&amp;#34;: 6,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;toward&amp;#34;: 7,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;you&amp;#34;: 8,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;inverse_vocab = {v: k for k, v in vocab.items()}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;next_token_logits = torch.tensor(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;[4.51, 0.89, -1.90, 6.75, 1.63, -1.62, -1.89, 6.28, 1.79]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def softmax_with_temperature(logits, temperature):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; scaled_logits = logits / temperature
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; return torch.softmax(scaled_logits, dim=0)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;probas = softmax_with_temperature(next_token_logits, temperature=5)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def print_sampled_tokens(probas):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; torch.manual_seed(123)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; sample = [torch.multinomial(probas, num_samples=1).item()
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; for i in range(1_000)]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; sampled_ids = torch.bincount(torch.tensor(sample))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; for i, freq in enumerate(sampled_ids):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; print(f&amp;#34;{freq} x {inverse_vocab[i]}&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print_sampled_tokens(probas)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="top-k-采样"&gt;Top K 采样&lt;/h2&gt;
+&lt;p&gt;较高的温度值会让下一个词元的概率分布更加均匀，从而产生更加多样化的输出。但是有时候会产生语法不正确或者完全无意义的输出。&lt;/p&gt;</description></item><item><title>2025-09-14 从零构建大模型—在无监督数据上进行预训练</title><link>https://huizhixu.github.io/know_how/20250914%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9C%A8%E6%97%A0%E7%9B%91%E7%9D%A3%E6%95%B0%E6%8D%AE%E4%B8%8A%E8%BF%9B%E8%A1%8C%E9%A2%84%E8%AE%AD%E7%BB%83/</link><pubDate>Sun, 14 Sep 2025 01:37:47 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20250914%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9C%A8%E6%97%A0%E7%9B%91%E7%9D%A3%E6%95%B0%E6%8D%AE%E4%B8%8A%E8%BF%9B%E8%A1%8C%E9%A2%84%E8%AE%AD%E7%BB%83/</guid><description>&lt;p&gt;这一章主要分为以下三个部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;评估生成文本的质量&lt;/li&gt;
+&lt;li&gt;训练函数&lt;/li&gt;
+&lt;li&gt;对大模型进行预训练&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="一前情提要"&gt;一、前情提要&lt;/h1&gt;
+&lt;h2 id="文本生成前几章讲过的"&gt;文本生成（前几章讲过的）&lt;/h2&gt;
+&lt;p&gt;步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;分词器将输入文本转换成一系列词元ID&lt;/li&gt;
+&lt;li&gt;模型接收词元ID，并生成相应的logits&lt;/li&gt;
+&lt;li&gt;这些logits被转换回词元ID，分词器会将其解码为人类可读的文本
+logits是表示词汇表中每个词元的概率分布的向量。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;logits 怎么理解：&lt;/p&gt;
+&lt;p&gt;logits 是“未归一化”的概率分数向量。经过 softmax 后，logits 变成“概率分布”。&lt;/p&gt;
+&lt;p&gt;logits 的用途：&lt;/p&gt;
+&lt;p&gt;在推理阶段，取 logits 的 argmax 即可得到每个位置最可能的词元；也可以对 logits 应用温度缩放、Top-K、核采样等技术，再做 multinomial 采样，以平衡多样性与一致性。&lt;/p&gt;
+&lt;h2 id="权重参数"&gt;权重参数&lt;/h2&gt;
+&lt;p&gt;权重参数指的是在训练过程调整的参数。&lt;/p&gt;
+&lt;p&gt;PyTorch允许通过model.parameters()方法直接访问模型的所有可训练参数（包括Weights和Biases）&lt;/p&gt;
+&lt;h1 id="二评估文本生成"&gt;二、评估文本生成&lt;/h1&gt;
+&lt;h2 id="初始化"&gt;初始化&lt;/h2&gt;
+&lt;p&gt;用GPT_CONFIG_124M字典初始化GPTModel类，注意这里只是搭了个框架，随机初始化权重，所以模型生成的文本也是随机生成。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;from gpt2_module.gpt2 import GPTModel
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;GPT_CONFIG_124M ={
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;vocab_size&amp;#34;:50257,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;context_length&amp;#34;:1024,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;emb_dim&amp;#34;:768,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;n_heads&amp;#34;:12,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;n_layers&amp;#34;:12,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;drop_rate&amp;#34;:0.1,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &amp;#34;qkv_bias&amp;#34;:False
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def generate_text_simple(model, idx, max_new_tokens, context_size):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; for _ in range(max_new_tokens):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; # 将当前文本截断至大模型支持的长度
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; idx_cond = idx[:, -context_size:]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; with torch.no_grad():
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; logits = model(idx_cond)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; # 仅关注最后一个时间步的logits
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; logits = logits[:, -1, :]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; # 转换为概率分布
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; probs = torch.softmax(logits, dim=-1)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; # 采样下一个token
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; idx_next = torch.argmax(probs, dim=-1, keepdim=True)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; # 拼接采样的token
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; idx = torch.cat((idx, idx_next), dim=1)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; return idx
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def text_to_token_ids(text, tokenizer):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; encoded = tokenizer.encode(text, allowed_special={&amp;#39;&amp;lt;|endoftext|&amp;gt;&amp;#39;})
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; return encoded_tensor
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;def token_ids_to_text(token_ids, tokenizer):
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; flat = token_ids.squeeze(0)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; return tokenizer.decode(flat.tolist())
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;start_context = &amp;#34;Every effort moves you&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;tokenizer = tiktoken.get_encoding(&amp;#34;gpt2&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;model = GPTModel(GPT_CONFIG_124M)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;token_ids = generate_text_simple(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; model=model,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; idx=text_to_token_ids(start_context, tokenizer),
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; max_new_tokens=10,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; context_size=GPT_CONFIG_124M[&amp;#34;context_length&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(token_ids_to_text(token_ids, tokenizer))
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="交叉熵损失的计算"&gt;交叉熵损失的计算&lt;/h2&gt;
+&lt;p&gt;模型训练的目标是增大与正确目标词元ID对应的索引位置的softmax概率，也就是最大化正确词元的可能性。&lt;/p&gt;</description></item><item><title>2025-08-24 从零构建大模型-徒手组装GPT</title><link>https://huizhixu.github.io/know_how/20250824-%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B-%E5%BE%92%E6%89%8B%E7%BB%84%E8%A3%85gpt/</link><pubDate>Sun, 24 Aug 2025 01:37:49 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20250824-%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B-%E5%BE%92%E6%89%8B%E7%BB%84%E8%A3%85gpt/</guid><description>&lt;p&gt;《从零构建大模型》8周学习计划（按周打卡！）
+1️⃣ 数据预处理✅
+2️⃣ 注意力机制✅
+3️⃣ 徒手组装GPT✅
+4️⃣ 徒手训练GPT
+5️⃣ 微调：分类
+6️⃣ 微调：SFT
+7️⃣-8️⃣ 缓冲周&lt;/p&gt;
+&lt;h2 id="gpt的几个概念"&gt;GPT的几个概念：&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;参数：指模型的可训练权重，本质是模型的内部变量。在训练过程中通过调整和优化来最小化特定的损失函数来学习。&lt;/li&gt;
+&lt;li&gt;GPT-2和GPT3：架构基本相同，训练的数据量不同，参数量不同。GPT-2的权重公开，GPT-3的权重没有。&lt;/li&gt;
+&lt;li&gt;GPT2的config
+vocab_size表示使用50257个token组成的词汇表。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;context_length指的是模型一次输入的最大token 数量。&lt;/p&gt;
+&lt;p&gt;emb_dim表示嵌入维度大小。&lt;/p&gt;
+&lt;p&gt;n_heads表示多头注意力机制中注意力头的数量。&lt;/p&gt;
+&lt;p&gt;n_layers表示模型中的Transformer块数量。&lt;/p&gt;
+&lt;p&gt;drop_rate表示表示有10%的隐藏单元被随机丢弃，以防止过拟合。&lt;/p&gt;
+&lt;p&gt;qkv_bias指的是是否在多头注意力机制的线性层中添加一个偏置向量，用于查询、键和值的计算。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;GPT_CONFIG_124M &lt;span style="color:#f92672"&gt;=&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;vocab_size&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;50257&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;context_length&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;1024&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;emb_dim&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;768&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;n_heads&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;12&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;n_layers&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;12&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;drop_rate&amp;#34;&lt;/span&gt;:&lt;span style="color:#ae81ff"&gt;0.1&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#e6db74"&gt;&amp;#34;qkv_bias&amp;#34;&lt;/span&gt;:&lt;span style="color:#66d9ef"&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;GPT大语言模型的组件：嵌入层、Transformer块、输出层。&lt;/li&gt;
+&lt;li&gt;Transformer块包括层归一化，GELU激活函数、前馈神经网络、残差链接和多头注意力模块。
+&lt;img src="https://raw.githubusercontent.com/HuizhiXu/pictures/master/20250824/668b362d.png" alt=""&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="一打好框架构建dummy类"&gt;一、打好框架：构建Dummy类&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;这里的Dummy类只用于结构完整性，并不是具体真实的实现。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;数据在模型中的处理流程：它首先计算输入索引的词元和位置嵌入，然后应用dropout，接着通过Transformer块处理数据，再应用归一化，最后使用线性输出层生成logits。
+代码理解：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;nn.Embedding 的本质是创建一个权重矩阵，是把词表里的每一个 token_id 映射成一个向量。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;self.tok_emb = nn.Embedding(config[&amp;ldquo;vocab_size&amp;rdquo;], config[&amp;ldquo;emb_dim&amp;rdquo;])—— 在 &lt;strong&gt;init&lt;/strong&gt; 里建表，告诉模型：词表有多大，每个 token 要映射成多少维的向量。这一步只发生一次，把权重矩阵（形状 [vocab_size, emb_dim]）存到 self.tok_emb 里。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;tok_emb = self.tok_emb(in_idx)—— 在 forward 里查表（把输入的 token_id 拿去这张表里查对应的向量）。这一步每次前向传播都会调用，输入是形状 [batch, seq_len] 的整数张量，输出是 [batch, seq_len, emb_dim] 的嵌入张量。&lt;/p&gt;</description></item><item><title>2025-08-17 从零构建大模型——注意力机制</title><link>https://huizhixu.github.io/know_how/20250817%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/</link><pubDate>Sun, 17 Aug 2025 01:37:52 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20250817%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/</guid><description>&lt;h2 id="背景"&gt;背景&lt;/h2&gt;
+&lt;h3 id="编码器-解码器"&gt;编码器-解码器&lt;/h3&gt;
+&lt;p&gt;编码器将源语言的一串词元序列作为输入，并通过隐藏状态（一个中间神经网络层）编码整个输入序列的压缩表示（可以理解为嵌入）。然后，解码器利用其当前的隐藏状态开始逐个词元进行解码生成。&lt;/p&gt;
+&lt;p&gt;编码器-解码器RNN的缺陷：在解码阶段，RNN无法直接访问编码器中的早期隐藏状态，它只能依赖当前的隐藏状态。这可能导致上下文丢失，特别是在依赖关系可能跨越较长的距离的句子中。&lt;/p&gt;
+&lt;h2 id="构建大语言模型的三个阶段"&gt;构建大语言模型的三个阶段&lt;/h2&gt;
+&lt;p&gt;&lt;img src="https://raw.githubusercontent.com/HuizhiXu/pictures/master/20250817/bb022129.png" alt=""&gt;&lt;/p&gt;
+&lt;p&gt;（图来源于书籍）&lt;/p&gt;
+&lt;p&gt;这张图画得很清晰，第三章的主要学习注意力机制。&lt;/p&gt;
+&lt;h2 id="学习目标"&gt;学习目标&lt;/h2&gt;
+&lt;p&gt;实现4种注意力机制&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;简化版的自注意力机制&lt;/li&gt;
+&lt;li&gt;加入可训练的权重的自注意力机制&lt;/li&gt;
+&lt;li&gt;因果注意力机制&lt;/li&gt;
+&lt;li&gt;多头注意力机制&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="简化版的自注意力机制"&gt;简化版的自注意力机制&lt;/h2&gt;
+&lt;h3 id="关键概念"&gt;关键概念&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;注意力机制：对于输出，某些输入词元比其他词元更重要。重要性由注意力权重决定。&lt;/li&gt;
+&lt;li&gt;“自”是什么意思：&lt;/li&gt;
+&lt;li&gt;上下文向量是什么？&lt;/li&gt;
+&lt;li&gt;上下文向量怎么计算？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="实践"&gt;实践&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;import torch
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;inputs = torch.tensor(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [[0.43, 0.15, 0.89], # Your (x^1)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [0.55, 0.87, 0.66], # journey (x^2)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [0.57, 0.85, 0.64], # starts (x^3)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [0.22, 0.58, 0.33], # with (x^4)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [0.77, 0.25, 0.10], # one (x^5)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; [0.05, 0.80, 0.55]] # step (x^6)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(inputs.shape[0])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;query = inputs[1]
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;attn_scores = torch.empty(inputs.shape[0],inputs.shape[0])
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;attn_scores = inputs @ inputs.T
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(attn_scores)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;attn_weights = torch.softmax(attn_scores, dim=-1)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(&amp;#34;Attention weights:&amp;#34;, attn_weights)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(&amp;#34;Sum:&amp;#34;, attn_weights.sum(dim=-1))
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;all_context_vecs = attn_weights @ inputs
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;print(all_context_vecs)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="带可训练权重的自注意力机制缩放点积注意力-scaled-dot-product-attention"&gt;带可训练权重的自注意力机制（缩放点积注意力 scaled dot-product attention）&lt;/h2&gt;
+&lt;h3 id="关键概念-1"&gt;关键概念&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;缩放点积注意力&lt;/li&gt;
+&lt;li&gt;为什么要用Query 、Key和Value？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="实践-1"&gt;实践&lt;/h3&gt;
+&lt;p&gt;v1版：用nn.Parameter&lt;/p&gt;</description></item><item><title>2024-05-13 大型语言模型在「想」什么呢？ — 浅谈大型语言模型的可解释性</title><link>https://huizhixu.github.io/know_how/20240513explainable_llm/</link><pubDate>Mon, 13 May 2024 19:01:50 +0800</pubDate><guid>https://huizhixu.github.io/know_how/20240513explainable_llm/</guid><description>&lt;p&gt;Explainable 和 Interpretable的区别：&lt;/p&gt;
+&lt;p&gt;Explainable： 事物本身是黑箱，我们尝试去解释它的行为或输出。&lt;/p&gt;
+&lt;p&gt;Interpretable： 事物本身不是黑箱，其工作原理是清晰和可以理解的。&lt;/p&gt;</description></item><item><title>2024-04-22 用大语言模型打造AI Agent</title><link>https://huizhixu.github.io/know_how/20240421ai_agent/</link><pubDate>Mon, 22 Apr 2024 23:01:50 +0800</pubDate><guid>https://huizhixu.github.io/know_how/20240421ai_agent/</guid><description>&lt;p&gt;人类需要的不仅仅是大模型，而是能做复杂的多步骤的任务的大模型，Agent因此诞生了。&lt;/p&gt;
+&lt;h1 id="知名的ai-agent"&gt;知名的AI Agent&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;1. AutoGPT: &lt;a href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" rel="noopener"&gt;https://github.com/Significant-Gravitas/AutoGPT&lt;/a&gt;
+&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;AutoGPT是一个由Significant Gravitas开发的开源项目,旨在创建一个自主的AI代理,能够持续地学习、成长并完成各种任务。&lt;/p&gt;</description></item><item><title>2024-04-14 让AI村民组成虚拟村庄会发生什么事</title><link>https://huizhixu.github.io/know_how/20240414ai_virtual_town/</link><pubDate>Sun, 14 Apr 2024 19:01:50 +0800</pubDate><guid>https://huizhixu.github.io/know_how/20240414ai_virtual_town/</guid><description>&lt;p&gt;去年Agent很火的时候，就知道有斯坦福出的这个虚拟小镇的论文了，当时大家都很好奇，怎么能够让大语言模型来操纵agent做出非常复杂的行为呢？&lt;/p&gt;</description></item><item><title>2024-04-13 大型语言模型修炼史（第三阶段）</title><link>https://huizhixu.github.io/know_how/20240413the-history-of-cultivating-llm_second_part/</link><pubDate>Sat, 13 Apr 2024 19:01:50 +0800</pubDate><guid>https://huizhixu.github.io/know_how/20240413the-history-of-cultivating-llm_second_part/</guid><description>&lt;h1 id="第三阶段参与实战打磨技巧"&gt;第三阶段：参与实战，打磨技巧&lt;/h1&gt;
+&lt;p&gt;如何克服第二阶段的局限性呢？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;关键是用第一阶段的参数作为初始参数。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;（贝叶斯定理这不就来了嘛！）&lt;/p&gt;
+&lt;p&gt;所以第三阶段是由第一阶段和第二阶段组合而成的：&lt;/p&gt;
+&lt;p&gt;第一阶段：通过网络上任何语料学习而来的，叫做预训练Pretrain&lt;/p&gt;</description></item><item><title>2024-04-05 大型语言模型修炼史（第一、二阶段）</title><link>https://huizhixu.github.io/know_how/20240405the-history-of-cultivating-llm/</link><pubDate>Fri, 05 Apr 2024 20:01:50 +0800</pubDate><guid>https://huizhixu.github.io/know_how/20240405the-history-of-cultivating-llm/</guid><description>&lt;h1 id="背景知识"&gt;背景知识&lt;/h1&gt;
+&lt;p&gt;大模型的本质是文字接龙。输入一个未完成的句子，输出这个未完成的句子的下一个token。&lt;/p&gt;
+&lt;p&gt;大模型可以看成是一个函数。$$ f(未完成的句子)= 下一个token $$这个函数是一个有数十亿个未知参数的函数。&lt;/p&gt;</description></item></channel></rss>

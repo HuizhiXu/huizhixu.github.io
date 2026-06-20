@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Obsidian on 徐慧志的个人博客</title><link>https://huizhixu.github.io/tags/obsidian/</link><description>Recent content in Obsidian on 徐慧志的个人博客</description><generator>Hugo</generator><language>chs</language><lastBuildDate>Thu, 28 May 2026 01:37:56 +0000</lastBuildDate><atom:link href="https://huizhixu.github.io/tags/obsidian/index.xml" rel="self" type="application/rss+xml"/><item><title>2026-05-28 Hermes Agent 在微信里面操作Obsidian</title><link>https://huizhixu.github.io/know_how/20260528hermes-agent-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E9%87%8C%E9%9D%A2%E6%93%8D%E4%BD%9Cobsidian/</link><pubDate>Thu, 28 May 2026 01:37:56 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20260528hermes-agent-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E9%87%8C%E9%9D%A2%E6%93%8D%E4%BD%9Cobsidian/</guid><description>&lt;p&gt;装上 Hermes Agent 后，我一直希望它能帮我提高效率。Obsidian 也用了一个多月，感觉很实用，我还没在里面装 Claudian。我心想，既然都装了 Hermes Agent，能不能直接让它来操作 Obsidian？&lt;/p&gt;
+&lt;p&gt;试了一下，还真可以。&lt;/p&gt;
+&lt;p&gt;下面就是我的一些实战经验和踩过的坑。&lt;/p&gt;
+&lt;h2 id="安装hermes-agent"&gt;安装Hermes Agent&lt;/h2&gt;
+&lt;p&gt;安装倒是很简单，一行命令的事，&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;curl -fsSL https://res1.hermesagent.org.cn/install.sh | bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;装完之后，有几个命令你最好记一下，因为后面会反复用到，&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;hermes&lt;/code&gt; — 启动对话界面，就是你跟它聊天的窗口&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hermes gateway&lt;/code&gt; — 启动消息网关，这个后面连微信要用&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hermes gateway start&lt;/code&gt; — 让它后台跑着
+坦率的讲，我一开始以为装好就能用了，结果发现「对话」和「网关」是俩独立进程，得分别启动。这个坑我第一批就踩了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="把hermes装进微信"&gt;把Hermes装进微信&lt;/h2&gt;
+&lt;p&gt;连微信的步骤比我想象的简单。&lt;/p&gt;
+&lt;p&gt;运行 &lt;code&gt;hermes gateway setup&lt;/code&gt;，在列表里找到「微信」，选中它。然后会弹出一个二维码链接，复制到浏览器里打开，用手机微信扫码就行。&lt;/p&gt;
+&lt;p&gt;扫码之后，在微信里给这个bot发一条消息，它会回你一串配对码，类似这样，&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Pairing code: PIGX5N9I
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;Run: hermes pairing approve weixin PIGX5N9I
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;你在终端里跑一下 &lt;code&gt;hermes pairing approve weixin PIGX5N9I&lt;/code&gt;，看到 &lt;code&gt;Approved!&lt;/code&gt;，完事。&lt;/p&gt;
+&lt;p&gt;然后别忘了在微信里发一条 &lt;code&gt;/sethome&lt;/code&gt;，这样它就知道哪个聊天窗口是「家」，后续的通知啊主动推送啊都往这发。&lt;/p&gt;
+&lt;p&gt;这里我特别想多说一句。很多朋友可能觉得「配个微信有啥好说的」，但对我来说，&lt;strong&gt;这是从「在电脑前才能用AI」到「随时随地用AI」的分水岭&lt;/strong&gt;。我不需要再打开Terminal，不需要开什么Web界面，就在我最常用的App里，发条消息就行。&lt;/p&gt;
+&lt;p&gt;这种感觉太爽了。&lt;/p&gt;
+&lt;p&gt;多说一句，我没看出 OpenClaw 和 Hermes Agent 的区别，至少在使用体感上完全没区别。&lt;/p&gt;
+&lt;h2 id="安装ai新闻skill"&gt;安装AI新闻Skill&lt;/h2&gt;
+&lt;p&gt;我觉得 AI 现在最好玩的地方就是 Skills。Skill这东西，你可以理解成给 Agent 装「外挂」，让它突然就会做某些特定的事了。&lt;/p&gt;</description></item><item><title>2026-04-29 从 Notion 到 Obsidian：构建以 PARA 为核心的专属知识库</title><link>https://huizhixu.github.io/know_how/20260429%E4%BB%8E-notion-%E5%88%B0-obsidian_%E6%9E%84%E5%BB%BA%E4%BB%A5-para-%E4%B8%BA%E6%A0%B8%E5%BF%83%E7%9A%84%E4%B8%93%E5%B1%9E%E7%9F%A5%E8%AF%86%E5%BA%93/</link><pubDate>Wed, 29 Apr 2026 01:38:42 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20260429%E4%BB%8E-notion-%E5%88%B0-obsidian_%E6%9E%84%E5%BB%BA%E4%BB%A5-para-%E4%B8%BA%E6%A0%B8%E5%BF%83%E7%9A%84%E4%B8%93%E5%B1%9E%E7%9F%A5%E8%AF%86%E5%BA%93/</guid><description>&lt;p&gt;前段时间，Hermes Agent 项目在社区兴起，我也去研究了一番。在深入了解后，我忽然意识到一个事情：&lt;strong&gt;工程层面，大家都在把 Agent 系统做得越来越复杂、越来越重。但对于个人使用者而言，最重要的资产其实是我们自己的知识库。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我之前一直用 Notion，但是它也有缺点：启动慢；工作记录和个人生活记录混在一起，需要查询时很不方便。Obsidian 是与 Notion 齐名的另一款笔记软件，过去你可能随便选一个就行。&lt;strong&gt;但进入 AI 时代，Obsidian 多了 Notion 不具备的两个优势：1. 本地存储；2. 开源生态&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;另外Obsidian使用 Markdown 格式，天然适合 AI 阅读。于是我萌生了一个想法：把工作中涉及的技术、思考、职场沟通表达、读书笔记等，全部放到到一个专属知识库中。这些内容是我工作中随时要用的，即使当着同事面查找，也不会暴露不想让人看到的私人信息。&lt;/p&gt;
+&lt;p&gt;所以过去的几个礼拜，我一直在搭建我的Obsidian 的知识库。&lt;/p&gt;
+&lt;p&gt;它的安装和使用都非常简单，且支持多平台。还能像编程 IDE 一样自由选择字体、配色和界面风格。除了安装之外，&lt;strong&gt;我还用家里的NAS倒腾了多平台同步，官方的一个月5美金的云同步也是省下了。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我在用Notion时发现，自己想记录一个东西，却不知道该放哪个文件夹——它有时属于工作，有时属于生活，或者生活中的某个细分类别。&lt;/p&gt;
+&lt;p&gt;我试过用“技术/子技术”的方式来组织，但每个项目涉及的技术、实验、结果和进度管理，本应属于不同领域，却被我混在一起。&lt;strong&gt;例如，随着AI领域不断扩大，我接触的AI产品也越来越多，有时要记录产品本身，有时记录使用心得，有时记录技术路线，导致我的AI相关资料越来越多，却分散在各个地方，导致很多内容没能有效沉淀。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这次我借着 Obsidian 好好整理了一套适合自己的知识库结构，这篇文章主要想分享这套思路。它的核心清晰明了：每个内容都有明确的存放位置，再也不用像以前那样，想写点什么时找不到地方。&lt;/p&gt;
+&lt;h2 id="开始的设计理念"&gt;开始的设计理念&lt;/h2&gt;
+&lt;p&gt;最初，我打算按&lt;strong&gt;身份&lt;/strong&gt;来分类。&lt;/p&gt;
+&lt;p&gt;我的日常工作围绕 AI 算法，有时要探索 Agent 和 AI 产品，既看论文又写代码，偶尔还写文章、做读书笔记。从这些活动里可以提炼出四类身份：&lt;strong&gt;开发者、研究者、读者、写作者&lt;/strong&gt;。于是一个直观的树状结构浮现出来：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"&gt;&lt;code class="language-plain" data-lang="plain"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;├── 开发者 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 技术文档
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 开发的项目 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	└── 学习笔记与总结 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;├── 研究者 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 论文笔记与文献管理 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 研究思路整理
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	└── 论文复现实验记录
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;├── 读者 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 读书笔记 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	└── 个人知识库建设 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;├── 写作者 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 创意写作与故事构建 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	├── 公众号内容规划 
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;	└── 小红书写作 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;但这个看似清晰的树状结构，在实际使用中很快就暴露了问题：&lt;/p&gt;</description></item></channel></rss>

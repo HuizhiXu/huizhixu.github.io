@@ -1,0 +1,161 @@
+<!doctype html><html lang=chs itemscope itemtype=http://schema.org/WebPage><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=../../huizhi-mark-logo.png><title>2026-01-26 ComfyUI 学习（Day3）Z-Image-Turbo的三种生图方式 - 徐慧志的个人博客</title><meta name=description content="不同模型的三合一对应关系
+
+  
+      
+          
+          Diffusion Model
+          
+          CLIP
+          
+          VAE
+          
+      
+  
+  
+      
+          Z-image-turbo
+          z_image_turbo_bf16.safetensors
+          12.31GB
+          qwen_3_4b.safetensors
+          8.04
+          ae.safetensors
+          335.3
+      
+      
+          Qwen image edit
+          qwen_image_edit_2511_fp8mixed.safetensors
+          
+          qwen_2.5_vl_7b_fp8_scaled.safetensors
+          
+          qwen_image_vae.safetensors
+          
+      
+  
+
+Z image turbo
+1. Z-Image-Turbo 模型介绍
+Z-Image-Turbo 是阿里开源的高性能文生图模型。 官网上显示 Z-Image会有三个版本： Z-Image-Turbo， Z-Image-Base和Z-Image-Edit，但是目前只发布了Turbo版本。（https://huggingface.co/Tongyi-MAI/Z-Image-Turbo ）
+核心参数：
+
+模型规模: 6B参数（60亿）
+推理步数: 仅需8步（NFE），远低于传统模型的20+步
+硬件要求: 16GB显存即可运行（消费级显卡）
+推理速度: H100/H800环境下亚秒级生成
+开源协议: Apache-2.0（可商用）
+优势：
+
+
+
+照片级真实图像生成
+
+
+精细还原皮肤纹理、发丝、服装材质等细节
+
+
+双语文本渲染（中英文）
+
+
+准确渲染复杂中英文文本
+
+
+提示词增强与推理
+
+
+内置Prompt Enhancer，具备推理能力
+
+
+超越表面描述，挖掘潜在世界知识
+技术架构亮点:
+
+
+S3-DiT架构（Scalable Single-Stream DiT）
+
+
+将文本、视觉语义token、图像VAE token在序列级别拼接
+
+
+作为统一输入流，最大化参数效率
+
+
+相比双流架构更高效
+
+
+解耦式蒸馏 + 强化学习
+
+
+将推理流程从20+步缩短到8步
+
+
+在保持质量的同时大幅提升速度"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.5effb6723f5bcd3e7afefbb4815abcbc58a9e8f9d264625114a21ad1f88c84ad.css" integrity crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20260126comfyui-%E5%AD%A6%E4%B9%A0day3z-image-turbo%E7%9A%84%E4%B8%89%E7%A7%8D%E7%94%9F%E5%9B%BE%E6%96%B9%E5%BC%8F/"><meta property="og:site_name" content="徐慧志的个人博客"><meta property="og:title" content="2026-01-26 ComfyUI 学习（Day3）Z-Image-Turbo的三种生图方式"><meta property="og:description" content="不同模型的三合一对应关系 Diffusion Model CLIP VAE Z-image-turbo z_image_turbo_bf16.safetensors 12.31GB qwen_3_4b.safetensors 8.04 ae.safetensors 335.3 Qwen image edit qwen_image_edit_2511_fp8mixed.safetensors qwen_2.5_vl_7b_fp8_scaled.safetensors qwen_image_vae.safetensors Z image turbo 1. Z-Image-Turbo 模型介绍 Z-Image-Turbo 是阿里开源的高性能文生图模型。 官网上显示 Z-Image会有三个版本： Z-Image-Turbo， Z-Image-Base和Z-Image-Edit，但是目前只发布了Turbo版本。（https://huggingface.co/Tongyi-MAI/Z-Image-Turbo ）
+核心参数：
+模型规模: 6B参数（60亿） 推理步数: 仅需8步（NFE），远低于传统模型的20+步 硬件要求: 16GB显存即可运行（消费级显卡） 推理速度: H100/H800环境下亚秒级生成 开源协议: Apache-2.0（可商用） 优势： 照片级真实图像生成
+精细还原皮肤纹理、发丝、服装材质等细节
+双语文本渲染（中英文）
+准确渲染复杂中英文文本
+提示词增强与推理
+内置Prompt Enhancer，具备推理能力
+超越表面描述，挖掘潜在世界知识 技术架构亮点:
+S3-DiT架构（Scalable Single-Stream DiT）
+将文本、视觉语义token、图像VAE token在序列级别拼接
+作为统一输入流，最大化参数效率
+相比双流架构更高效
+解耦式蒸馏 + 强化学习
+将推理流程从20+步缩短到8步
+在保持质量的同时大幅提升速度"><meta property="og:locale" content="chs"><meta property="og:type" content="article"><meta property="article:section" content="know_how"><meta property="article:published_time" content="2026-01-26T01:38:34+00:00"><meta property="article:modified_time" content="2026-01-26T01:38:34+00:00"><meta property="article:tag" content="Tech"><meta property="article:tag" content="Ai"><meta property="article:tag" content="Comfyui"><meta name=twitter:card content="summary"><meta name=twitter:title content="2026-01-26 ComfyUI 学习（Day3）Z-Image-Turbo的三种生图方式"><meta name=twitter:description content="不同模型的三合一对应关系 Diffusion Model CLIP VAE Z-image-turbo z_image_turbo_bf16.safetensors 12.31GB qwen_3_4b.safetensors 8.04 ae.safetensors 335.3 Qwen image edit qwen_image_edit_2511_fp8mixed.safetensors qwen_2.5_vl_7b_fp8_scaled.safetensors qwen_image_vae.safetensors Z image turbo 1. Z-Image-Turbo 模型介绍 Z-Image-Turbo 是阿里开源的高性能文生图模型。 官网上显示 Z-Image会有三个版本： Z-Image-Turbo， Z-Image-Base和Z-Image-Edit，但是目前只发布了Turbo版本。（https://huggingface.co/Tongyi-MAI/Z-Image-Turbo ）
+核心参数：
+模型规模: 6B参数（60亿） 推理步数: 仅需8步（NFE），远低于传统模型的20+步 硬件要求: 16GB显存即可运行（消费级显卡） 推理速度: H100/H800环境下亚秒级生成 开源协议: Apache-2.0（可商用） 优势： 照片级真实图像生成
+精细还原皮肤纹理、发丝、服装材质等细节
+双语文本渲染（中英文）
+准确渲染复杂中英文文本
+提示词增强与推理
+内置Prompt Enhancer，具备推理能力
+超越表面描述，挖掘潜在世界知识 技术架构亮点:
+S3-DiT架构（Scalable Single-Stream DiT）
+将文本、视觉语义token、图像VAE token在序列级别拼接
+作为统一输入流，最大化参数效率
+相比双流架构更高效
+解耦式蒸馏 + 强化学习
+将推理流程从20+步缩短到8步
+在保持质量的同时大幅提升速度"><meta itemprop=name content="2026-01-26 ComfyUI 学习（Day3）Z-Image-Turbo的三种生图方式"><meta itemprop=description content="不同模型的三合一对应关系 Diffusion Model CLIP VAE Z-image-turbo z_image_turbo_bf16.safetensors 12.31GB qwen_3_4b.safetensors 8.04 ae.safetensors 335.3 Qwen image edit qwen_image_edit_2511_fp8mixed.safetensors qwen_2.5_vl_7b_fp8_scaled.safetensors qwen_image_vae.safetensors Z image turbo 1. Z-Image-Turbo 模型介绍 Z-Image-Turbo 是阿里开源的高性能文生图模型。 官网上显示 Z-Image会有三个版本： Z-Image-Turbo， Z-Image-Base和Z-Image-Edit，但是目前只发布了Turbo版本。（https://huggingface.co/Tongyi-MAI/Z-Image-Turbo ）
+核心参数：
+模型规模: 6B参数（60亿） 推理步数: 仅需8步（NFE），远低于传统模型的20+步 硬件要求: 16GB显存即可运行（消费级显卡） 推理速度: H100/H800环境下亚秒级生成 开源协议: Apache-2.0（可商用） 优势： 照片级真实图像生成
+精细还原皮肤纹理、发丝、服装材质等细节
+双语文本渲染（中英文）
+准确渲染复杂中英文文本
+提示词增强与推理
+内置Prompt Enhancer，具备推理能力
+超越表面描述，挖掘潜在世界知识 技术架构亮点:
+S3-DiT架构（Scalable Single-Stream DiT）
+将文本、视觉语义token、图像VAE token在序列级别拼接
+作为统一输入流，最大化参数效率
+相比双流架构更高效
+解耦式蒸馏 + 强化学习
+将推理流程从20+步缩短到8步
+在保持质量的同时大幅提升速度"><meta itemprop=datePublished content="2026-01-26T01:38:34+00:00"><meta itemprop=dateModified content="2026-01-26T01:38:34+00:00"><meta itemprop=wordCount content="191"><meta itemprop=keywords content="Tech,Ai,Comfyui"><meta name=lang content="chs"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel=stylesheet><link rel=stylesheet href=../../custom.css></head><body class="dark:bg-gray-800 dark:text-white relative flex flex-col min-h-screen"><header class="container flex justify-between md:justify-between gap-4 flex-wrap p-6 mx-auto relative"><a href=https://huizhixu.github.io/ class="capitalize font-extrabold text-2xl"><img src=../../huizhi-mark-logo.png alt=徐慧志的个人博客 class="h-12 w-12 object-contain">
+</a><button class="mobile-menu-button md:hidden">
+<svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></button><ul class="mobile-menu absolute z-10 px-6 pb-6 md:p-0 top-full left-0 w-full md:w-auto md:relative hidden md:flex flex-col md:flex-row items-end md:items-center gap-4 lg:gap-6 bg-white dark:bg-gray-800"><li><a href=../../know_how/ class="font-semibold border-b-2 border-blue-500 pb-0.5 transition-colors duration-150">技术</a></li><li><a href=../../life/ class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-150">生活</a></li><li><a href=../../page/about/ class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-150">关于</a></li><li><a href=../../tags/ class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-150">分类</a></li><li class="relative cursor-pointer"><span class="language-switcher flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><line x1="3.6" y1="9" x2="20.4" y2="9"/><line x1="3.6" y1="15" x2="20.4" y2="15"/><path d="M11.5 3a17 17 0 000 18"/><path d="M12.5 3a17 17 0 010 18"/></svg>
+<a>语言</a>
+<svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12" transform="rotate(180 12 12)"/></svg></span><div class="language-dropdown absolute top-full mt-2 left-0 flex-col gap-2 bg-gray-100 dark:bg-gray-900 dark:text-white z-10 hidden"><a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../en/ lang=en>English</a>
+<a class="px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-700" href=../../de/ lang=de>Deutsch</a></div></li><li class="grid place-items-center"><span class="open-search inline-block cursor-pointer"><svg width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg></span></li><li class="grid place-items-center"><span class="toggle-dark-mode inline-block cursor-pointer"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="5" x2="12" y2="5.01"/><line x1="17" y1="7" x2="17" y2="7.01"/><line x1="19" y1="12" x2="19" y2="12.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="12" y1="19" x2="12" y2="19.01"/><line x1="7" y1="17" x2="7" y2="17.01"/><line x1="5" y1="12" x2="5" y2="12.01"/><line x1="7" y1="7" x2="7" y2="7.01"/></svg></span></li></ul></header><main class=flex-1><div class="max-w-6xl mx-auto px-4 my-8"><div class="lg:grid lg:gap-12 lg:items-start" style=grid-template-columns:minmax(0,1fr)256px><article class="prose prose-lg dark:prose-dark max-w-none article-content"><h1 class="text-3xl font-bold mb-3 leading-tight">2026-01-26 ComfyUI 学习（Day3）Z-Image-Turbo的三种生图方式</h1><div class="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-400 dark:text-gray-500 mb-6 not-prose"><span class="flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/><rect x="8" y="15" width="2" height="2"/></svg>
+发布于
+2026年01月26日
+</span><span class="text-gray-300 dark:text-gray-600">·</span>
+<span class="flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+1&nbsp;分钟
+</span><span class="text-gray-300 dark:text-gray-600">·</span>
+<span class="flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 019 0 9 9 0 019 0"/><path d="M3 6a9 9 0 019 0 9 9 0 019 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/></svg>
+191&nbsp;字
+</span><span class="text-gray-300 dark:text-gray-600">·</span>
+<span class="flex flex-wrap gap-1 not-prose"><a href=../../tags/tech/ class="text-xs bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400 rounded-full px-2 py-0.5 no-underline hover:bg-blue-100 transition-colors">tech</a>
+<a href=../../tags/ai/ class="text-xs bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400 rounded-full px-2 py-0.5 no-underline hover:bg-blue-100 transition-colors">ai</a>
+<a href=../../tags/comfyui/ class="text-xs bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400 rounded-full px-2 py-0.5 no-underline hover:bg-blue-100 transition-colors">comfyui</a></span></div><div class="lg:hidden mb-6"><details id=TableOfContents class="px-4 mt-4 bg-gray-100 dark:bg-gray-700 rounded toc"><summary class="flex items-center font-bold py-2 px-4 cursor-pointer justify-between select-none text-black dark:text-white"><span>Table of contents</span>
+<svg class="icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="6 9 12 15 18 9"/></svg></summary><ul class="mt-2 pb-4"><li><a href=#%e4%b8%8d%e5%90%8c%e6%a8%a1%e5%9e%8b%e7%9a%84%e4%b8%89%e5%90%88%e4%b8%80%e5%af%b9%e5%ba%94%e5%85%b3%e7%b3%bb>不同模型的三合一对应关系</a></li><li><a href=#z-image-turbo>Z image turbo</a><ul><li><a href=#1-z-image-turbo-%e6%a8%a1%e5%9e%8b%e4%bb%8b%e7%bb%8d>1. Z-Image-Turbo 模型介绍</a></li><li><a href=#2-z_image_turbo-%e6%a8%a1%e5%9e%8b%e4%b8%8b%e8%bd%bd>2. Z_Image_Turbo 模型下载</a></li><li><a href=#3-z_image_turbo-%e6%96%87%e7%94%9f%e5%9b%be>3. Z_Image_Turbo 文生图</a></li><li><a href=#4-z_image_turbo-%e5%9b%be%e7%94%9f%e5%9b%belora>4. Z_Image_Turbo 图生图+LoRA</a></li><li><a href=#5-z_image_turbo-%e5%b1%80%e9%83%a8%e9%87%8d%e7%bb%98>5. Z_Image_Turbo 局部重绘</a></li><li><a href=#%e5%9b%be%e7%94%9f%e5%9b%be%e5%92%8c%e6%96%87%e7%94%9f%e5%9b%be%e7%9a%84%e5%8c%ba%e5%88%ab>图生图和文生图的区别</a></li></ul></li></ul></details></div><h2 id=不同模型的三合一对应关系>不同模型的三合一对应关系</h2><table><thead><tr><th></th><th>Diffusion Model</th><th></th><th>CLIP</th><th></th><th>VAE</th><th></th></tr></thead><tbody><tr><td>Z-image-turbo</td><td>z_image_turbo_bf16.safetensors</td><td>12.31GB</td><td>qwen_3_4b.safetensors</td><td>8.04</td><td>ae.safetensors</td><td>335.3</td></tr><tr><td>Qwen image edit</td><td>qwen_image_edit_2511_fp8mixed.safetensors</td><td></td><td>qwen_2.5_vl_7b_fp8_scaled.safetensors</td><td></td><td>qwen_image_vae.safetensors</td><td></td></tr></tbody></table><h2 id=z-image-turbo>Z image turbo</h2><h3 id=1-z-image-turbo-模型介绍>1. Z-Image-Turbo 模型介绍</h3><p>Z-Image-Turbo 是阿里开源的高性能文生图模型。 官网上显示 Z-Image会有三个版本： Z-Image-Turbo， Z-Image-Base和Z-Image-Edit，但是目前只发布了Turbo版本。（https://huggingface.co/Tongyi-MAI/Z-Image-Turbo ）</p><p><strong>核心参数：</strong></p><ul><li>模型规模: 6B参数（60亿）</li><li>推理步数: 仅需8步（NFE），远低于传统模型的20+步</li><li>硬件要求: 16GB显存即可运行（消费级显卡）</li><li>推理速度: H100/H800环境下亚秒级生成</li><li>开源协议: Apache-2.0（可商用）
+<strong>优势：</strong></li></ul><ol><li><p>照片级真实图像生成</p></li><li><p>精细还原皮肤纹理、发丝、服装材质等细节</p></li><li><p>双语文本渲染（中英文）</p></li><li><p>准确渲染复杂中英文文本</p></li><li><p>提示词增强与推理</p></li><li><p>内置Prompt Enhancer，具备推理能力</p></li><li><p>超越表面描述，挖掘潜在世界知识
+<strong>技术架构亮点:</strong></p></li><li><p>S3-DiT架构（Scalable Single-Stream DiT）</p></li><li><p>将文本、视觉语义token、图像VAE token在序列级别拼接</p></li><li><p>作为统一输入流，最大化参数效率</p></li><li><p>相比双流架构更高效</p></li><li><p>解耦式蒸馏 + 强化学习</p></li><li><p>将推理流程从20+步缩短到8步</p></li><li><p>在保持质量的同时大幅提升速度</p></li></ol><h3 id=2-z_image_turbo-模型下载>2. Z_Image_Turbo 模型下载</h3><p>因为服务器不能外网，可以在modelscope/hf-mirror 本地下载模型，也可以复制链接去服务器上下载。前面说过，模型和数据都要按照相应的文件夹名存储。例如这次的模型会在models下面。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/a00adcbb.png alt=1></p><p>除了diffustion_models， clip和vae三部分之外，还有loras。这里的loras 是用来增加图片细节的。</p><h3 id=3-z_image_turbo-文生图>3. Z_Image_Turbo 文生图</h3><p>有一个特别神奇和方便的东西是，有的图片会附带工作流，下面这张图片，直接拖到ComfyUI界面，会出现生成这张图片的工作流。</p><p><a href=https://comfyanonymous.github.io/ComfyUI_examples/z_image/ target=_blank rel=noopener>https://comfyanonymous.github.io/ComfyUI_examples/z_image/</a></p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/5d0e091a.png alt=2></p><p>工作流如下</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/671346d7.png alt=3></p><p>模型采样算法<code>AuraFlow</code>：控制生成图片的不确定性。</p><p>空 latent image 相当于在画画时候的建立画布，画布的大小是1024*1024。</p><p>VAE解码器：VAE编码先将图片映射到64<em>64，这样计算的时候参数量不会过于庞大，然后再用VAE解码器释放到1024</em>1024。</p><p>Ksampler的参数：</p><p><code>cfg</code>（Classifier-Free Guidance）：提示词引导系数。值越低，图像越自由、越有创意（也越可能忽略提示词）；值越高，对提示词的遵循度越强，但可能牺牲图像质量和多样性。如果模型很厉害，那么cfg调到1就可以了。</p><p><code>steps</code>：7步</p><p><code>sample_name</code>： euler</p><p><code>scheduler</code>: simple</p><p>(关于sample_name和Scheduler这两个参数，后面发现用er_sde和beta效果更好。)</p><p><code>denoise</code>: 生图模型是一个扩散模型，生成图片属于一个反扩散的过程。它控制从噪声图中开始去噪的步数比例。 <code>denoise=1.0</code> 表示从100%的噪声开始（文生图）；<code>denoise=0.5</code> 表示从去噪过程的中途开始（即原图添加了适量噪声），因此会保留更多原图信息。</p><p>种子数：每一张生成出来的图片都会有一个对应的种子数。随机表示每一张都不一样。</p><p>如果想要生成带有工作流信息的照片，可以用这个节点：</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/0a1846ba.png alt=4></p><h3 id=4-z_image_turbo-图生图lora>4. Z_Image_Turbo 图生图+LoRA</h3><p>下面使用两种LoRA来比较效果。用的prompt是“一个动漫风女孩子”。</p><ol><li><strong>用官方自带的LoRA。前面说过，官方的LoRA仅仅用来增加细节。</strong>
+<img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/467b97e7.png alt=5></li></ol><p>这里面有一个节点叫做Image Comparer，选rgthree，这个节点可以动态对比原图和参考图。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/95746d03.gif alt=6-min></p><p>这是图生图的任务，所以一定会参考原图，那么会参考多少原图？</p><ul><li>图像的尺寸信息会被参考</li><li>图像的已有的元素会被参考。如果要更多参考已有的元素，应该把 denoise 设小一些。因为这张图片对于工作流来说是已经被聚集好的图片，工作流只需要在里面重新添加一些粒子，然后再次降噪，就可以生成一个全新的一张图片。
+改变denoise就可以设置参考原图的强度，这是设为0.6的时候。</li></ul><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/9c7e45a1.JPEG alt=7></p><ol><li><strong>下载其他的LoRA</strong>
+在liblib下载OVC模型，放置在文件夹models/loras/z_image下面。（<strong>再次强调要按照类别存储模型，这样在工作流里选择模型的时候容易区分。</strong>）</li></ol><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/f41d4d38.png alt=8></p><p>用上面这个LoRA，推荐权重 0.8。</p><p>Denoise 设为0.9的效果。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/2bf22957.jpeg alt=9></p><p>denoise设为0.64的效果。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/b5bca7a6.jpeg alt=10></p><p><strong>这里最重要的参数之一就是denoise。denoise是重绘幅度。</strong></p><p><strong>可以看出，denoise越高，就越靠近lora模型的效果，越来越偏离参考图片。denoise最高的时候，就和原图没什么关系了，唯一有关系的地方就是尺寸，会采用原图的宽高比和分辨率。</strong></p><p><strong>denoise越低，就越靠近参考图片。</strong></p><table><thead><tr><th>denoise值</th><th>适用场景</th></tr></thead><tbody><tr><td>1</td><td>文生图、完全重绘</td></tr><tr><td>0.7-0.9</td><td>风格大幅转换</td></tr><tr><td>0.4-0.6</td><td>图像优化、细节调整</td></tr><tr><td>0.2-0.3</td><td>轻微修复、微调</td></tr></tbody></table><h3 id=5-z_image_turbo-局部重绘>5. Z_Image_Turbo 局部重绘</h3><p>采用Z_Image_Turbo做局部重绘。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/aeea17e0.png alt=11></p><p>增加一个Set Latent Noise Mask，然后右键点击图片，选择Open in Mask Editor + Image Canvas， 把要重绘的地方都mask掉。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/68aab6ea.png alt=12></p><p>如果遮罩太生硬，可以用遮罩模糊生长结点（Grow Mask With Blur），工作流里面有</p><p>这张图是我尝试了好几次之后效果稍微好一点的结果。发现Z-Image-Turbo模型改图能力确实很一般，指令遵循能力不行。</p><p><img src=https://raw.githubusercontent.com/HuizhiXu/pictures/master/20260126/22417bce.jpeg alt=13>(<a href="https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=M2IyZThiMWJkZjc1MjI2YmQ5NTgzYmE2Mjk2ODRmMjFfN245TnFFVTB6MlBzWE1EYjF3dkZUOFF2WTZTOFZNU1hfVG9rZW46RjgyQmIzSEswb0FMMUh4NzFRNWNJZ203bldoXzE3Njk0MjgyNjE6MTc2OTQzMTg2MV9WNA" target=_blank rel=noopener>https://uvidumfqwzk.feishu.cn/space/api/box/stream/download/asynccode/?code=M2IyZThiMWJkZjc1MjI2YmQ5NTgzYmE2Mjk2ODRmMjFfN245TnFFVTB6MlBzWE1EYjF3dkZUOFF2WTZTOFZNU1hfVG9rZW46RjgyQmIzSEswb0FMMUh4NzFRNWNJZ203bldoXzE3Njk0MjgyNjE6MTc2OTQzMTg2MV9WNA</a>
+)</p><p>**知道模型的能力边界是很重要的。**Z-Image-Turbo的模型能力边界：生图质量高，快速，是一个Turbo模型，但是不擅长改图。</p><h3 id=图生图和文生图的区别>图生图和文生图的区别</h3><p>观察上面的三种方式，会发现有的时候图像直接用一个 Empty Latent Image 与 KSampler相连，有时候需要用 VAE Encode 节点先处理，再加一个Set Latent Noise Mask，再与 KSampler相连。</p><p>这里有一个Latent Space的概念。</p><p><strong>潜空间（Latent Space）</strong></p><ul><li>Stable Diffusion等扩散模型工作在潜空间而非像素空间</li><li>VAE负责在两个空间之间转换：</li><li>VAE Encode：从像素空间到潜空间</li><li>VAE Decode：从潜空间到像素空间</li><li>Empty Latent Image直接创建潜空间数据
+<strong>所以在文生图的任务中，是从零开始生成新图像，Empty Latent Image用来创建一个空白的潜空间。在图生图或者局部重绘任务中，需要基于现有的图像进行修改，所以要用VAE Encode将将像素空间的图像转换为潜空间。而Set Latent Noise Mask则指定哪些区域需要重绘，哪些区域保持不变。</strong></li></ul></article><aside class="hidden lg:block"><div class="sticky top-8 sidebar-toc"><p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3 px-1">目录</p><details id=TableOfContents class="px-4 mt-4 bg-gray-100 dark:bg-gray-700 rounded toc"><summary class="flex items-center font-bold py-2 px-4 cursor-pointer justify-between select-none text-black dark:text-white"><span>Table of contents</span>
+<svg class="icon icon-tabler icon-tabler-chevron-down" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="6 9 12 15 18 9"/></svg></summary><ul class="mt-2 pb-4"><li><a href=#%e4%b8%8d%e5%90%8c%e6%a8%a1%e5%9e%8b%e7%9a%84%e4%b8%89%e5%90%88%e4%b8%80%e5%af%b9%e5%ba%94%e5%85%b3%e7%b3%bb>不同模型的三合一对应关系</a></li><li><a href=#z-image-turbo>Z image turbo</a><ul><li><a href=#1-z-image-turbo-%e6%a8%a1%e5%9e%8b%e4%bb%8b%e7%bb%8d>1. Z-Image-Turbo 模型介绍</a></li><li><a href=#2-z_image_turbo-%e6%a8%a1%e5%9e%8b%e4%b8%8b%e8%bd%bd>2. Z_Image_Turbo 模型下载</a></li><li><a href=#3-z_image_turbo-%e6%96%87%e7%94%9f%e5%9b%be>3. Z_Image_Turbo 文生图</a></li><li><a href=#4-z_image_turbo-%e5%9b%be%e7%94%9f%e5%9b%belora>4. Z_Image_Turbo 图生图+LoRA</a></li><li><a href=#5-z_image_turbo-%e5%b1%80%e9%83%a8%e9%87%8d%e7%bb%98>5. Z_Image_Turbo 局部重绘</a></li><li><a href=#%e5%9b%be%e7%94%9f%e5%9b%be%e5%92%8c%e6%96%87%e7%94%9f%e5%9b%be%e7%9a%84%e5%8c%ba%e5%88%ab>图生图和文生图的区别</a></li></ul></li></ul></details></div></aside></div></div><section class="prose lg:prose-lg mx-auto my-8 dark:prose-dark px-4"><h2>相关文章</h2><ul><li><a href=../../know_how/20260528hermes-agent-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E9%87%8C%E9%9D%A2%E6%93%8D%E4%BD%9Cobsidian/>2026-05-28 Hermes Agent 在微信里面操作Obsidian</a></li><li><a href=../../know_how/20260429%E4%BB%8E-notion-%E5%88%B0-obsidian_%E6%9E%84%E5%BB%BA%E4%BB%A5-para-%E4%B8%BA%E6%A0%B8%E5%BF%83%E7%9A%84%E4%B8%93%E5%B1%9E%E7%9F%A5%E8%AF%86%E5%BA%93/>2026-04-29 从 Notion 到 Obsidian：构建以 PARA 为核心的专属知识库</a></li><li><a href=../../know_how/20260331comfyui%E5%AD%A6%E4%B9%A0day-8qwen-image-%E9%A3%8E%E6%A0%BClora%E8%AE%AD%E7%BB%83/>2026-03-31 ComfyUI学习（Day 8）Qwen-Image 风格LoRA训练</a></li></ul></section><div class="px-2 mb-2"><script src=https://utteranc.es/client.js repo=HuizhiXu/huizhixu.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script></div><div class="bg-blue-100 dark:bg-gray-900"><div class="container px-4 py-12 mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center"><div><div class="text-2xl font-bold mb-2">Sein heißt werden, leben heißt lernen.</div><p class=opacity-60>Der einfache Weg is immer verkehrt.</p></div><ul class="flex justify-center gap-x-3 flex-wrap gap-y-2"><li><a href=https://github.com/HuizhiXu target=_blank rel=noopener aria-label=GitHub class="p-1 inline-block rounded-full border border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-800 cursor-pointer transition-colors dark:text-gray-600 dark:hover:border-gray-300 dark:hover:text-gray-300"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ul></div></div><script>const sidebarDetails=document.querySelector(".sidebar-toc details");sidebarDetails&&sidebarDetails.setAttribute("open","")</script></main><footer class="footer-wrap container max-w-6xl p-6 mx-auto"><div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700"><span class="text-sm font-light text-gray-500 dark:text-gray-400">Copyright © 2012 - Huizhi Xu · All rights reserved
+</span><span onclick='window.scrollTo({top:0,behavior:"smooth"})' class="p-1 cursor-pointer text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"><svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 15l-6-6-6 6h12"/></svg></span></div></footer><div class="search-ui absolute top-0 left-0 w-full h-full bg-white dark:bg-gray-800 hidden"><div class="container max-w-3xl mx-auto p-12"><div class=relative><div class="my-4 text-center text-2xl font-bold">Search</div><span class="p-2 absolute right-0 top-0 cursor-pointer close-search"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><input type=search class="py-2 px-3 w-full dark:text-black border dark:border-transparent" placeholder="Enter search query"><div class="search-results text-lg font-medium my-4 hidden">Results</div><ul class="search-list my-2"></ul><div class="no-results text-center my-8 hidden"><div class="text-xl font-semibold mb-2">No results found</div><p class="font-light text-sm">Try adjusting your search query</p></div></div></div><script src=https://huizhixu.github.io/js/scripts.min.js></script><script>const languageMenuButton=document.querySelector(".language-switcher"),languageDropdown=document.querySelector(".language-dropdown");languageMenuButton.addEventListener("click",e=>{e.preventDefault(),languageDropdown.classList.contains("hidden")?(languageDropdown.classList.remove("hidden"),languageDropdown.classList.add("flex")):(languageDropdown.classList.add("hidden"),languageDropdown.classList.remove("flex"))})</script><script>const darkmode=document.querySelector(".toggle-dark-mode");function toggleDarkMode(){document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("darkmode","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("darkmode","dark"))}darkmode&&darkmode.addEventListener("click",toggleDarkMode);const darkStorage=localStorage.getItem("darkmode"),isBrowserDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;!darkStorage&&isBrowserDark&&document.documentElement.classList.add("dark"),darkStorage&&darkStorage==="dark"&&toggleDarkMode()</script><script>const mobileMenuButton=document.querySelector(".mobile-menu-button"),mobileMenu=document.querySelector(".mobile-menu");function toggleMenu(){mobileMenu.classList.toggle("hidden"),mobileMenu.classList.toggle("flex")}mobileMenu&&mobileMenuButton&&mobileMenuButton.addEventListener("click",toggleMenu)</script></body></html>
