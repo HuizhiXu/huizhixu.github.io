@@ -110,7 +110,10 @@
 然而，琳达却认为，即使一段婚姻只能维持六个月或者一年，也依然值得尝试。
 第二天早晨，马洛送琳达上了出租车，目送她离开。
 回到卧室后，他注意到琳达昨夜睡过的枕头上，留下了一根长长的黑发。
-他们之间这段短暂的爱情，就这样结束了。&lt;/p&gt;</description></item><item><title>关于我</title><link>https://huizhixu.github.io/page/about/</link><pubDate>Sat, 20 Jun 2026 01:37:53 +0000</pubDate><guid>https://huizhixu.github.io/page/about/</guid><description>&lt;p&gt;你好，很高兴遇到你。&lt;/p&gt;
+他们之间这段短暂的爱情，就这样结束了。&lt;/p&gt;</description></item><item><title>RSI 笔记02｜Harness如何实现自我进化？</title><link>https://huizhixu.github.io/know_how/harness-self-improvement/</link><pubDate>Sun, 19 Jul 2026 00:00:00 +0800</pubDate><guid>https://huizhixu.github.io/know_how/harness-self-improvement/</guid><description>&lt;p&gt;如果你关注 AI 前沿技术，最近一定频繁看到一个词：&lt;strong&gt;RSI（Recursive Self-Improvement，递归自我改进）&lt;/strong&gt; 。&lt;/p&gt;
+&lt;p&gt;那么，RSI 到底是什么？Harness 又是如何实现自我进化的？通过 Lilien Weng 的博客文章，我们可以知道最新的发展。&lt;/p&gt;</description></item><item><title>RSI 笔记01｜Harness不是Agent，那是什么？</title><link>https://huizhixu.github.io/know_how/harness-vs-agent/</link><pubDate>Fri, 17 Jul 2026 00:00:00 +0800</pubDate><guid>https://huizhixu.github.io/know_how/harness-vs-agent/</guid><description>&lt;p&gt;最近RSI真的太火了，正好 Lilian Weng 发了一篇关于Harness 和 RSI 的文章，信息量极大。我反复读了几遍，决定把它拆解成三篇，从我的角度来理解这件事。&lt;/p&gt;
+&lt;h2 id="一什么是-harness"&gt;一、什么是 Harness？&lt;/h2&gt;
+&lt;p&gt;在 Lilian Weng 的文章中，Harness 被定义为&lt;strong&gt;围绕基础模型搭建的系统，负责编排执行流程，决定模型如何思考、规划、调用工具、管理上下文和评估结果&lt;/strong&gt;。&lt;/p&gt;</description></item><item><title>一个人用 Cursor 交付完整应用后的思考</title><link>https://huizhixu.github.io/know_how/building-an-app-with-cursor/</link><pubDate>Tue, 14 Jul 2026 00:00:00 +0800</pubDate><guid>https://huizhixu.github.io/know_how/building-an-app-with-cursor/</guid><description>&lt;p&gt;最近一个多月的时间里，我几乎把所有精力都投入到了一个项目中——用 Cursor Pro +，一个人做了一个 AI 应用。这不是一个 demo 或者原型，而是一个真正交付给业务团队使用的、包含算法、前端和后端的完整应用。&lt;/p&gt;</description></item><item><title>关于我</title><link>https://huizhixu.github.io/page/about/</link><pubDate>Sat, 20 Jun 2026 01:37:53 +0000</pubDate><guid>https://huizhixu.github.io/page/about/</guid><description>&lt;p&gt;你好，很高兴遇到你。&lt;/p&gt;
 &lt;p&gt;我是慧志，一名工程师。我喜欢技术，也喜欢阅读和写作。这里是我的自留地。&lt;/p&gt;
 &lt;p&gt;这个博客从学生时代开始，一直写到现在。大连、柏林、上海，读书、工作、旅行、亲人和朋友，还有一些开心、焦虑、离别和重新开始，都在这里面。&lt;/p&gt;
 &lt;p&gt;以前的文章现在读起来，有些幼稚，也有点啰嗦。偶尔看到某些句子，我会想：当时怎么连这个也写出来了？不过转念一想，那确实就是当时的我。人的想法本来就会变，没有必要假装自己从一开始就很成熟。&lt;/p&gt;
