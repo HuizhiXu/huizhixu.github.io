@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Blog on 徐慧志的个人博客</title><link>https://huizhixu.github.io/</link><description>Recent content in Blog on 徐慧志的个人博客</description><generator>Hugo</generator><language>chs</language><lastBuildDate>Wed, 28 Oct 2026 13:44:33 +0000</lastBuildDate><atom:link href="https://huizhixu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>20261026 FLUX 3 Image Klein 使用笔记：提示词扩写、布局控制和局部改图</title><link>https://huizhixu.github.io/know_how/20261026-flux-3-image-klein-%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%89%A9%E5%86%99%E5%B8%83%E5%B1%80%E6%8E%A7%E5%88%B6%E5%92%8C%E5%B1%80%E9%83%A8%E6%94%B9%E5%9B%BE/</link><pubDate>Wed, 28 Oct 2026 13:44:33 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20261026-flux-3-image-klein-%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%89%A9%E5%86%99%E5%B8%83%E5%B1%80%E6%8E%A7%E5%88%B6%E5%92%8C%E5%B1%80%E9%83%A8%E6%94%B9%E5%9B%BE/</guid><description>&lt;p&gt;这篇主要写 FLUX 3 Image Klein 在 ComfyUI 里的用法，包括怎么选工作流、怎么扩写提示词，以及怎么用 Bounding Box 控制布局、修改图片里的某个元素。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Blog on Sophia的小天地</title><link>https://huizhixu.github.io/</link><description>Recent content in Blog on Sophia的小天地</description><generator>Hugo</generator><language>chs</language><lastBuildDate>Wed, 28 Oct 2026 13:44:33 +0000</lastBuildDate><atom:link href="https://huizhixu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>20261026 FLUX 3 Image Klein 使用笔记：提示词扩写、布局控制和局部改图</title><link>https://huizhixu.github.io/know_how/20261026-flux-3-image-klein-%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%89%A9%E5%86%99%E5%B8%83%E5%B1%80%E6%8E%A7%E5%88%B6%E5%92%8C%E5%B1%80%E9%83%A8%E6%94%B9%E5%9B%BE/</link><pubDate>Wed, 28 Oct 2026 13:44:33 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20261026-flux-3-image-klein-%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%89%A9%E5%86%99%E5%B8%83%E5%B1%80%E6%8E%A7%E5%88%B6%E5%92%8C%E5%B1%80%E9%83%A8%E6%94%B9%E5%9B%BE/</guid><description>&lt;p&gt;这篇主要写 FLUX 3 Image Klein 在 ComfyUI 里的用法，包括怎么选工作流、怎么扩写提示词，以及怎么用 Bounding Box 控制布局、修改图片里的某个元素。&lt;/p&gt;
 &lt;p&gt;先记住一点：Bounding Box 是可选的。不接它，也可以直接用提示词出图；需要指定物体的位置、大小，或者圈出要修改的区域时，再把它接进来。&lt;/p&gt;
 &lt;h2 id="一flux-3-和工作流"&gt;一、FLUX 3 和工作流&lt;/h2&gt;
 &lt;p&gt;FLUX 3 是 Black Forest Labs 的模型系列，包含图像、视频等不同方向。这次涉及的主要是图像模型。&lt;/p&gt;
@@ -111,15 +111,13 @@
 第二天早晨，马洛送琳达上了出租车，目送她离开。
 回到卧室后，他注意到琳达昨夜睡过的枕头上，留下了一根长长的黑发。
 他们之间这段短暂的爱情，就这样结束了。&lt;/p&gt;</description></item><item><title>关于我</title><link>https://huizhixu.github.io/page/about/</link><pubDate>Sat, 20 Jun 2026 01:37:53 +0000</pubDate><guid>https://huizhixu.github.io/page/about/</guid><description>&lt;p&gt;你好，很高兴遇到你。&lt;/p&gt;
-&lt;p&gt;我是慧志，一名工程师。我喜欢技术，也喜欢阅读和写作。工作之外，我喜欢到处走走，也愿意尝试各种新鲜的事情。&lt;/p&gt;
-&lt;p&gt;工作中遇到不懂的问题，我习惯一边查资料，一边把过程记下来。这里的技术文章大多就是这样产生的。有些是完整的梳理，有些只是阶段性的理解，后来有了新的认识，我也会再回来修改。&lt;/p&gt;
-&lt;p&gt;AI 发展得很快，新东西几乎每天都在出现。有时候觉得兴奋，有时候也会焦虑，怕自己跟不上。我也会想，技术究竟会怎样改变我们的工作和生活，我们现在学的东西以后还有没有用。当然，这些问题我也没有答案，只能边学边看，偶尔记下一些当时的想法。&lt;/p&gt;
-&lt;p&gt;我也写生活。&lt;/p&gt;
-&lt;p&gt;这个博客从学生时代开始，一直写到现在。大连、德国、上海，读书、工作、旅行、亲人和朋友，还有一些开心、焦虑、离别和重新开始，都留在了这里。&lt;/p&gt;
+&lt;p&gt;我是慧志，一名工程师。我喜欢技术，也喜欢阅读和写作。这里是我的自留地。&lt;/p&gt;
+&lt;p&gt;这个博客从学生时代开始，一直写到现在。大连、柏林、上海，读书、工作、旅行、亲人和朋友，还有一些开心、焦虑、离别和重新开始，都在这里面。&lt;/p&gt;
 &lt;p&gt;以前的文章现在读起来，有些幼稚，也有点啰嗦。偶尔看到某些句子，我会想：当时怎么连这个也写出来了？不过转念一想，那确实就是当时的我。人的想法本来就会变，没有必要假装自己从一开始就很成熟。&lt;/p&gt;
 &lt;p&gt;我一直很喜欢阅读。读过的东西常常会忘，但它们还是在不知不觉中影响了我。&lt;/p&gt;
-&lt;p&gt;我不太相信几个标签就能概括一个人。职业不能，MBTI 不能，某一段经历也不能。我更愿意相信人有一点“趋光性”：喜欢什么，就多去亲近什么。时间久了，也许真的会慢慢长成自己喜欢的样子。&lt;/p&gt;
-&lt;p&gt;这里没有特别严格的主题。技术笔记、读书记录、旅行见闻和生活琐事都有。看起来有点杂，但也没关系，生活本来就是这样。&lt;/p&gt;
+&lt;p&gt;我不太相信几个标签就能概括一个人。职业不能，MBTI 不能，某一段经历也不能。我更愿意相信人的可塑性：喜欢什么，就多去亲近什么。时间久了，会慢慢长成自己喜欢的样子。&lt;/p&gt;
+&lt;p&gt;AI 发展得很快，新东西几乎每天都在出现。有时候觉得兴奋，有时候也会焦虑，怕自己跟不上。我也会想，技术究竟会怎样改变我们的工作和生活，我们现在学的东西以后还有没有用。当然，这些问题我也没有答案，只能边学边看，偶尔记下一些当时的想法。&lt;/p&gt;
+&lt;p&gt;总之，这里没有特别严格的主题。技术笔记、读书记录、旅行见闻和生活琐事都有。看起来有点杂，但是生活本来就是这样。&lt;/p&gt;
 &lt;p&gt;欢迎你来这里逛逛。&lt;/p&gt;</description></item><item><title>2026-05-28 Hermes Agent 在微信里面操作Obsidian</title><link>https://huizhixu.github.io/know_how/20260528hermes-agent-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E9%87%8C%E9%9D%A2%E6%93%8D%E4%BD%9Cobsidian/</link><pubDate>Thu, 28 May 2026 01:37:56 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20260528hermes-agent-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E9%87%8C%E9%9D%A2%E6%93%8D%E4%BD%9Cobsidian/</guid><description>&lt;p&gt;装上 Hermes Agent 后，我一直希望它能帮我提高效率。Obsidian 也用了一个多月，感觉很实用，我还没在里面装 Claudian。我心想，既然都装了 Hermes Agent，能不能直接让它来操作 Obsidian？&lt;/p&gt;
 &lt;p&gt;试了一下，还真可以。&lt;/p&gt;
 &lt;p&gt;下面就是我的一些实战经验和踩过的坑。&lt;/p&gt;
