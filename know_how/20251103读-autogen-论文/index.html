@@ -42,7 +42,7 @@ GroupChatManager：用于管理群组对话的专门组件
 2.控制流（Control Flow）：计算发生的条件
 4.2 自动回复机制
 AutoGen的核心创新在于实现了统一接口和自动回复机制，使聊天自动化成为可能。该机制包括send、receive和generate_reply三个核心功能。一旦对话开始，系统可以自动运行，无需额外控制。
-智能体自动回复机制是AutoGen的核心特性："><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.0b82474ccd8e1d8544dd988f782424c7f436d334959a3e55a2e6e9520b52bca9.css" integrity="sha256-C4JHTM2OHYVE3ZiPeCQkx/Q20zSVmj5VoubpUgtSvKk=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20251103%E8%AF%BB-autogen-%E8%AE%BA%E6%96%87/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-11-03 读 AutoGen 论文"><meta property="og:description" content="最近微软把AutoGen和Semantic Kernel 整合到一个框架了，叫做 Agent Framework。这两个框架，之前一个负责多智能体协作，一个负责写胶水代码，提供流程框架和中间件。
+智能体自动回复机制是AutoGen的核心特性："><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.2befbe86f73b78533bfc9c43088f61e030a6e5bf8b37e9cb2f229c8b41cdb31a.css" integrity="sha256-K+++hvc7eFM7/JxDCI9h4DCm5b+LN+nLLyKci0HNsxo=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20251103%E8%AF%BB-autogen-%E8%AE%BA%E6%96%87/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-11-03 读 AutoGen 论文"><meta property="og:description" content="最近微软把AutoGen和Semantic Kernel 整合到一个框架了，叫做 Agent Framework。这两个框架，之前一个负责多智能体协作，一个负责写胶水代码，提供流程框架和中间件。
 最近看了看AutoGen的论文，主要为了搞清楚它的智能体是如何协作运行的。下面介绍一下原理。
 1. 什么是AutoGen？ 简单来说，AutoGen就是一个让多个AI智能体能够互相聊天、合作的框架。
 1.1 核心需求 AutoGen的设计目标是构建一个多智能体对话框架，具有通用抽象和有效实现，同时具备满足不同应用需求的灵活性。该框架需要考虑两个关键问题：

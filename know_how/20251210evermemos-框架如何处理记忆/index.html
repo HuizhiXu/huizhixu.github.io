@@ -13,7 +13,7 @@ MemCell的生成分为以下三步：
 语义记忆则抽取出对话中的关键概念及其相互关系；
 事件日志记录最细粒度的原子事实。
 所有这些被提取的结构化记忆最终会被存储至MongoDB数据库，并同时索引到Elasticsearch（用于全文搜索）和Milvus（用于向量相似性检索）中，形成一个完整且易于检索的动态记忆体系。
-"><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.0b82474ccd8e1d8544dd988f782424c7f436d334959a3e55a2e6e9520b52bca9.css" integrity="sha256-C4JHTM2OHYVE3ZiPeCQkx/Q20zSVmj5VoubpUgtSvKk=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20251210evermemos-%E6%A1%86%E6%9E%B6%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E8%AE%B0%E5%BF%86/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-12-10 EverMemOS 框架如何处理记忆"><meta property="og:description" content="之前在Agent记忆那篇文章下，有网友推荐 EverMemOS，这几天抽空看了一下这个框架，关注的重点依然是记忆的处理。
+"><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.2befbe86f73b78533bfc9c43088f61e030a6e5bf8b37e9cb2f229c8b41cdb31a.css" integrity="sha256-K+++hvc7eFM7/JxDCI9h4DCm5b+LN+nLLyKci0HNsxo=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20251210evermemos-%E6%A1%86%E6%9E%B6%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E8%AE%B0%E5%BF%86/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-12-10 EverMemOS 框架如何处理记忆"><meta property="og:description" content="之前在Agent记忆那篇文章下，有网友推荐 EverMemOS，这几天抽空看了一下这个框架，关注的重点依然是记忆的处理。
 EverMemOS 框架最大的特点在于 MemCell 这个原子结构的提出。MemCell 是从对话中提取的、按照话题和时间切割的最小语义单元。
 MemCell的生成分为以下三步：
 当对话流输入后，系统首先会进行消息预处理，过滤非文本消息，并将图片、视频等多媒体内容以占位符形式表示。

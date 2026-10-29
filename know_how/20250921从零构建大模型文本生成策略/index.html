@@ -52,7 +52,7 @@ def print_sampled_tokens(probas):
 
 print_sampled_tokens(probas)
 Top K 采样
-较高的温度值会让下一个词元的概率分布更加均匀，从而产生更加多样化的输出。但是有时候会产生语法不正确或者完全无意义的输出。'><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.0b82474ccd8e1d8544dd988f782424c7f436d334959a3e55a2e6e9520b52bca9.css" integrity="sha256-C4JHTM2OHYVE3ZiPeCQkx/Q20zSVmj5VoubpUgtSvKk=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20250921%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-09-21 从零构建大模型—文本生成策略"><meta property="og:description" content='在解码的时候，生成的词元是从词汇表的所有词元中选择概率分数最大的那一个，也就是argmax最大的词元id，但是这种形式让大模型失去丰富性，因为多次运行大模型生成的文本是相同的。
+较高的温度值会让下一个词元的概率分布更加均匀，从而产生更加多样化的输出。但是有时候会产生语法不正确或者完全无意义的输出。'><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.2befbe86f73b78533bfc9c43088f61e030a6e5bf8b37e9cb2f229c8b41cdb31a.css" integrity="sha256-K+++hvc7eFM7/JxDCI9h4DCm5b+LN+nLLyKci0HNsxo=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20250921%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-09-21 从零构建大模型—文本生成策略"><meta property="og:description" content='在解码的时候，生成的词元是从词汇表的所有词元中选择概率分数最大的那一个，也就是argmax最大的词元id，但是这种形式让大模型失去丰富性，因为多次运行大模型生成的文本是相同的。
 两种技术（温度缩放和Top-k采样）可以用于文本生成的优化。
 温度缩放 用一个从概率分布（这里是大语言模型在每个词元生成步骤为每个词汇条目生成的概率分数）中采样的函数来取代argmax。
 这个概率采样函数Multinomial按照词汇表的概率分数采样下一个词元。

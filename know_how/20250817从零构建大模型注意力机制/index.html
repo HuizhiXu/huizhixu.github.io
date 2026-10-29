@@ -52,7 +52,7 @@ print(all_context_vecs)
 为什么要用Query 、Key和Value？
 
 实践
-v1版：用nn.Parameter'><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.0b82474ccd8e1d8544dd988f782424c7f436d334959a3e55a2e6e9520b52bca9.css" integrity="sha256-C4JHTM2OHYVE3ZiPeCQkx/Q20zSVmj5VoubpUgtSvKk=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20250817%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-08-17 从零构建大模型——注意力机制"><meta property="og:description" content='背景 编码器-解码器 编码器将源语言的一串词元序列作为输入，并通过隐藏状态（一个中间神经网络层）编码整个输入序列的压缩表示（可以理解为嵌入）。然后，解码器利用其当前的隐藏状态开始逐个词元进行解码生成。
+v1版：用nn.Parameter'><meta name=author content="Sophia"><meta name=generator content="Hugo 0.152.2"><link rel=stylesheet href="/css/styles.min.2befbe86f73b78533bfc9c43088f61e030a6e5bf8b37e9cb2f229c8b41cdb31a.css" integrity="sha256-K+++hvc7eFM7/JxDCI9h4DCm5b+LN+nLLyKci0HNsxo=" crossorigin=anonymous><meta property="og:url" content="https://huizhixu.github.io/know_how/20250817%E4%BB%8E%E9%9B%B6%E6%9E%84%E5%BB%BA%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/"><meta property="og:site_name" content="Sophia的小天地"><meta property="og:title" content="2025-08-17 从零构建大模型——注意力机制"><meta property="og:description" content='背景 编码器-解码器 编码器将源语言的一串词元序列作为输入，并通过隐藏状态（一个中间神经网络层）编码整个输入序列的压缩表示（可以理解为嵌入）。然后，解码器利用其当前的隐藏状态开始逐个词元进行解码生成。
 编码器-解码器RNN的缺陷：在解码阶段，RNN无法直接访问编码器中的早期隐藏状态，它只能依赖当前的隐藏状态。这可能导致上下文丢失，特别是在依赖关系可能跨越较长的距离的句子中。
 构建大语言模型的三个阶段 （图来源于书籍）
 这张图画得很清晰，第三章的主要学习注意力机制。
