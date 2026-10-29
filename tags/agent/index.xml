@@ -55,11 +55,22 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;但这个看似清晰的树状结构，在实际使用中很快就暴露了问题：&lt;/p&gt;</description></item><item><title>2026-02-14 令人期待的月之暗面的 Agent Swarm</title><link>https://huizhixu.github.io/know_how/20260214%E4%BB%A4%E4%BA%BA%E6%9C%9F%E5%BE%85%E7%9A%84%E6%9C%88%E4%B9%8B%E6%9A%97%E9%9D%A2%E7%9A%84agentswarm/</link><pubDate>Sat, 14 Feb 2026 00:00:00 +0000</pubDate><guid>https://huizhixu.github.io/know_how/20260214%E4%BB%A4%E4%BA%BA%E6%9C%9F%E5%BE%85%E7%9A%84%E6%9C%88%E4%B9%8B%E6%9A%97%E9%9D%A2%E7%9A%84agentswarm/</guid><description>&lt;p&gt;最近比较关注的是月之暗面发布的 K2.5 模型，我不仅看了杨植麟的发布视频，也去 Reddit 浏览了了关于 K2.5 的讨论。（讨论链接在这儿: &lt;a href="https://www.reddit.com/r/LocalLLaMA/comments/1qpewj7/ama_with_kimi_the_opensource_frontier_lab_behind/" target="_blank" rel="noopener"&gt;https://www.reddit.com/r/LocalLLaMA/comments/1qpewj7/ama_with_kimi_the_opensource_frontier_lab_behind/&lt;/a&gt;
  ）&lt;/p&gt;
 &lt;p&gt;K2.5 的提升主要在以下几个方面：&lt;/p&gt;
-&lt;p&gt;1. 前端网页能力：支持上传图片或者视频做同款内容。模型的视觉能力大幅提升。我觉得这很厉害，因为我们人类接收到信息中最多的是视觉信息而不是文本信息。&lt;/p&gt;
-&lt;p&gt;2. Coding 能力: 不仅仅是网页前端，Kimi Code 现在支持 images 和 video作为输入，支持多种编程语言。&lt;/p&gt;
-&lt;p&gt;3. 办公场景（Office）：能够生成专业级别的 Word 和 Excel 文档，制作专家级的PPT，完成 PDF 的专业排版。&lt;/p&gt;
-&lt;p&gt;4. Agent Swarm（Agent 集群）：通过多个专家智能体协同处理大批量信息，例如调研一百家公司或阅读一百篇论文。单个任务最多可调用100个智能体，工具调用次数上限达 1500 次。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;前端网页能力&lt;/strong&gt;：支持上传图片或者视频做同款内容。模型的视觉能力大幅提升。&lt;strong&gt;我觉得这很厉害，因为我们人类接收到信息中最多的是视觉信息而不是文本信息。&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Coding 能力&lt;/strong&gt;: 不仅仅是网页前端，Kimi Code 现在支持 images 和 video作为输入，支持多种编程语言。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;办公场景（Office）&lt;/strong&gt;：能够生成专业级别的 Word 和 Excel 文档，制作专家级的PPT，完成 PDF 的专业排版。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Agent Swarm（Agent 集群）&lt;/strong&gt;：通过多个专家智能体协同处理大批量信息，例如调研一百家公司或阅读一百篇论文。单个任务最多可调用100个智能体，工具调用次数上限达 1500 次。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 &lt;p&gt;模型发布本身并不稀奇——每个月都有模型发布（没错，百花齐放，大家都在拼命往前赶）。但这次我对里面的 Agent Swarm 有极大的兴趣。从小红书某个大佬那里争取到了一些 Agent Swarm 的测试额度，因为额度有期限，这几天便抓紧时间使用。&lt;/p&gt;
 &lt;p&gt;测试 Agent Swarm 最大的难点在于找到合适的场景，因为测试 AI 最难的是结合用户（也就是我）的真实需求，这个需要通过精心设计。&lt;/p&gt;
-&lt;p&gt;官方说 Agent Swarm 特别适合处理大批量任务。因为它有多个Agent，我认为它应该也具备深度研究功能，它可能是深度研究 + Office + OK Computer + Coding Agent 四者的结合，其中 OK Computer 是 Coding Agent 的一个分支，更适合前端或者网页任务。&lt;/p&gt;
-&lt;p&gt;我为 Agent Swarm 设计了三个任务：一个是导览词的撰写以及网站生成（需要信息收集+撰写+网站搭建+多模态生成），另一个是多轮对话的调研并编写微调代码（目的是与之前的深度研究结果做对比）。这两个任务都顺利完成，第三个任务（论文撰写和投稿）因为额度不足没有再测试了。&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;官方说 Agent Swarm 特别适合处理大批量任务。&lt;strong&gt;因为它有多个Agent，我认为它应该也具备深度研究功能，它可能是深度研究 + Office + OK Computer + Coding Agent 四者的结合&lt;/strong&gt;，其中 OK Computer 是 Coding Agent 的一个分支，更适合前端或者网页任务。&lt;/p&gt;
+&lt;p&gt;我为 Agent Swarm 设计了三个任务：一个是导览词的撰写以及网站生成（需要信息收集+撰写+网站搭建+多模态生成），另一个是多轮对话的调研并编写微调代码（目的是与之前的深度研究结果做对比）。这两个任务都顺利完成，第三个任务（论文撰写和投稿）因为额度不足没有再测试了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总的来说，Agent Swarm 给我带来了全新的体验。尤其是导游词撰写任务，运行了整整 1 小时 19 分钟。整个过程中我一直盯着屏幕，对其它的处理逻辑非常满意。它的每一步都清晰合理，如果这个任务换做我来做，我也会这样处理。&lt;/strong&gt; 这种体验很特别，让人耳目一新。市面上 Multi-Agent 系统不少，但我还从没见过配合这么好这么专业的团队。&lt;/p&gt;</description></item></channel></rss>
